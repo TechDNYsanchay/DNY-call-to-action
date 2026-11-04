@@ -1,0 +1,34 @@
+import { timingSafeEqual } from "node:crypto";
+
+/** Constant-time comparison. Fails closed: an unset expected secret never matches. */
+export function secretMatches(presented: string | null | undefined, expected: string | undefined): boolean {
+  if (!expected || !presented) return false;
+  const a = Buffer.from(presented);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+/** From the x-webhook-secret header, or ?secret= for senders that cannot set headers (tl;dv can). */
+export function presentedWebhookSecret(request: Request): string | null {
+  return request.headers.get("x-webhook-secret") ?? new URL(request.url).searchParams.get("secret");
+}
+
+/** Vercel Cron and the Claude Code routine send "Authorization: Bearer <token>". */
+export function presentedBearer(request: Request): string | null {
+  const auth = request.headers.get("authorization");
+  return auth?.startsWith("Bearer ") ? auth.slice("Bearer ".length) : null;
+}
+
+/** Shared checks for webhook routes. Returns an error response, or the parsed JSON body. */
+export async function readWebhook(request: Request, expectedSecret: string | undefined): Promise<{ error: Response } | { payload: unknown }> {
+  if (!expectedSecret) return { error: Response.json({ error: "Webhook secret not configured" }, { status: 503 }) };
+  if (!secretMatches(presentedWebhookSecret(request), expectedSecret)) {
+    console.warn(`webhook ${new URL(request.url).pathname}: refused, wrong or missing secret`);
+    return { error: Response.json({ error: "Unauthorised" }, { status: 401 }) };
+  }
+  const length = Number(request.headers.get("content-length") ?? 0);
+  if (length > 2_000_000) return { error: Response.json({ error: "Body too large" }, { status: 413 }) };
+  const payload: unknown = await request.json().catch(() => undefined);
+  if (payload === undefined) return { error: Response.json({ error: "Body must be JSON" }, { status: 400 }) };
+  return { payload };
+}

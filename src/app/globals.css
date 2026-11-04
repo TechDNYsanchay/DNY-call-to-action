@@ -1,0 +1,211 @@
+@import "tailwindcss";
+
+/* Shift Sheet design tokens. Semantic colours only: bottle = DNY owes, sienna = client owes,
+   signal = risk, slate = questions and facts, steel = ERP. Light and dark share the same roles. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-devanagari: var(--font-plex-devanagari), var(--font-plex-sans), sans-serif;
+
+  --color-canvas: var(--canvas);
+  --color-sheet: var(--sheet);
+  --color-raised: var(--raised);
+  --color-inset: var(--inset);
+  --color-hairline: var(--hairline);
+  --color-strong: var(--border-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-bottle: var(--bottle);
+  --color-bottle-tint: var(--bottle-tint);
+  --color-bottle-strong: var(--bottle-strong);
+  --color-sienna: var(--sienna);
+  --color-sienna-tint: var(--sienna-tint);
+  --color-sienna-strong: var(--sienna-strong);
+  --color-signal: var(--signal);
+  --color-signal-tint: var(--signal-tint);
+  --color-slate: var(--slate);
+  --color-slate-tint: var(--slate-tint);
+  --color-steel: var(--steel);
+  --color-steel-tint: var(--steel-tint);
+  --color-focus: var(--focus);
+
+  --radius-chip: 6px;
+  --radius-card: 10px;
+  --shadow-card: var(--shadow-card);
+
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root {
+  --canvas: #e8ebe7;
+  --sheet: #ffffff;
+  --raised: #f4f6f3;
+  --inset: #eef1ed;
+  --hairline: #d3d8d1;
+  --border-strong: #b8c0b6;
+  --ink: #14201a;
+  --ink-2: #4f5b54;
+  --ink-3: #7b867f;
+  --bottle: #1a5a44;
+  --bottle-tint: #e2f1ea;
+  --bottle-strong: #0f4634;
+  --sienna: #9e4418;
+  --sienna-tint: #f8e9df;
+  --sienna-strong: #7c3410;
+  --signal: #b42318;
+  --signal-tint: #fbe9e7;
+  --slate: #3b5578;
+  --slate-tint: #e7edf5;
+  --steel: #475569;
+  --steel-tint: #eaeef3;
+  --focus: #1f6fe5;
+  --shadow-card: 0 1px 2px rgba(20, 32, 26, 0.06), 0 0 0 1px var(--hairline);
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --canvas: #0f1412;
+  --sheet: #171d1a;
+  --raised: #1e2622;
+  --inset: #121816;
+  --hairline: #2a332e;
+  --border-strong: #3a453f;
+  --ink: #e8ece8;
+  --ink-2: #aeb7b1;
+  --ink-3: #7f8a83;
+  --bottle: #6fd1a6;
+  --bottle-tint: #16302a;
+  --bottle-strong: #8fe0bd;
+  --sienna: #f0a071;
+  --sienna-tint: #35241a;
+  --sienna-strong: #f6b88f;
+  --signal: #f97066;
+  --signal-tint: #3a1d1b;
+  --slate: #9db6da;
+  --slate-tint: #1d2733;
+  --steel: #a3afbf;
+  --steel-tint: #1f262e;
+  --focus: #78a9ff;
+  --shadow-card: 0 0 0 1px var(--hairline);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --canvas: #0f1412;
+    --sheet: #171d1a;
+    --raised: #1e2622;
+    --inset: #121816;
+    --hairline: #2a332e;
+    --border-strong: #3a453f;
+    --ink: #e8ece8;
+    --ink-2: #aeb7b1;
+    --ink-3: #7f8a83;
+    --bottle: #6fd1a6;
+    --bottle-tint: #16302a;
+    --bottle-strong: #8fe0bd;
+    --sienna: #f0a071;
+    --sienna-tint: #35241a;
+    --sienna-strong: #f6b88f;
+    --signal: #f97066;
+    --signal-tint: #3a1d1b;
+    --slate: #9db6da;
+    --slate-tint: #1d2733;
+    --steel: #a3afbf;
+    --steel-tint: #1f262e;
+    --focus: #78a9ff;
+    --shadow-card: 0 0 0 1px var(--hairline);
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.47;
+    font-feature-settings: "ss02";
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (min-width: 1024px) {
+    body {
+      font-size: 14px;
+    }
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: var(--bottle-tint);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "ss02";
+}
+
+@utility card {
+  background: var(--sheet);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+@utility hairline-y {
+  border-top: 1px solid var(--hairline);
+}
+
+@utility devanagari {
+  font-family: var(--font-devanagari);
+}
+
+/* Skeleton shimmer; static under reduced motion (handled by the base layer above). */
+@utility shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--raised);
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: shimmer 1.2s linear infinite;
+}
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
