@@ -11,7 +11,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "db:types": "npx supabase gen types typescript --linked > src/lib/supabase/database.types.tmp && mv src/lib/supabase/database.types.tmp src/lib/supabase/database.types.ts",
     "db:seed": "tsx --env-file=.env.local scripts/seed.mts",
-    "replay": "tsx --env-file=.env.local scripts/replay-webhook.mts"
+    "replay": "tsx --env-file=.env.local scripts/replay-webhook.mts",
+    "people": "tsx --env-file=.env.local scripts/people.mts"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

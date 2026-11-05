@@ -152,6 +152,10 @@ export const SheetSchema = z
 export type Sheet = z.infer<typeof SheetSchema>;
 export type ActionItem = z.infer<typeof ActionItemSchema>;
 export type Evidence = z.infer<typeof EvidenceSchema>;
+export type Decision = z.infer<typeof DecisionSchema>;
+export type KeyFact = z.infer<typeof KeyFactSchema>;
+export type Risk = z.infer<typeof RiskSchema>;
+export type OpenQuestion = z.infer<typeof OpenQuestionSchema>;
 
 /** The classifier's answer when the rules could not decide. */
 export const ClassificationSchema = z

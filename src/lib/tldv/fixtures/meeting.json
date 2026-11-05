@@ -1,0 +1,18 @@
+{
+  "id": "6911a3f0c2d4e8b1a7f93c21",
+  "name": "Hotel Sunrise Udaipur - weekly ops review",
+  "happenedAt": "2026-11-03T05:00:00.000Z",
+  "url": "https://app.tldv.io/meetings/6911a3f0c2d4e8b1a7f93c21",
+  "duration": 2712,
+  "organizer": { "name": "Priya Nair", "email": "priya@dnyhospitality.com" },
+  "invitees": [
+    { "name": "Priya Nair", "email": "priya@dnyhospitality.com" },
+    { "name": "Arjun Mehta", "email": "arjun@dnyhospitality.com" },
+    { "name": "Rakesh Agarwal", "email": "rakesh@hotelsunrise.in" },
+    { "name": "Sunita Agarwal", "email": "sunita.agarwal@gmail.com" }
+  ],
+  "template": { "id": "default", "label": "Default" },
+  "extraProperties": { "conferenceId": "abc-defg-hij" },
+  "phoneNumber": null,
+  "metadata": null
+}

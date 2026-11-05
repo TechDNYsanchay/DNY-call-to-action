@@ -157,11 +157,17 @@ max_indexes = 5
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://127.0.0.1:3000"
+site_url = "https://dny-call-to-action.vercel.app"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+# The production callback is covered by site_url's host; localhost needs listing. The sign-in page
+# appends ?next=<path> to the callback, so the wildcard entry lets a local redirect keep its query.
+additional_redirect_urls = [
+  "https://dny-call-to-action.vercel.app/auth/callback",
+  "http://localhost:3200/auth/callback",
+  "http://localhost:3200/auth/callback**",
+]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -173,8 +179,9 @@ enable_refresh_token_rotation = true
 # Allows refresh tokens to be reused after expiry, up to the specified interval in seconds.
 # Requires enable_refresh_token_rotation = true.
 refresh_token_reuse_interval = 10
-# Allow/disallow new user signups to your project. Existing users can still sign in.
-enable_signup = true
+# Sign-ups are closed: only logins created by an admin (Settings > Team or scripts/people.mts) exist,
+# and the people table decides who gets in. Google and email links work for existing users only.
+enable_signup = false
 # Allow/disallow anonymous sign-ins to your project.
 enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
@@ -220,6 +227,8 @@ web3 = 30
 [auth.email]
 # Allow/disallow the email provider. When false, users can't sign up or sign in with email.
 # To block new signups only, set enable_signup = false under [auth] instead.
+# Kept on for the one-time sign-in links; with [auth] enable_signup = false an unknown address gets
+# "Signups not allowed", which the login page explains as "not on the team list".
 enabled = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
@@ -249,6 +258,12 @@ otp_expiry = 3600
 # [auth.email.template.invite]
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
+
+# One-time sign-in email in the app's own look. The link lands on our /auth/callback with the hashed
+# token (not on Supabase's verify page), so it works on any device. Applied with `npx supabase config push`.
+[auth.email.template.magic_link]
+subject = "Your Call to Action sign-in link"
+content_path = "./supabase/templates/magic_link.html"
 
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
@@ -323,6 +338,26 @@ max_frequency = "5s"
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
 # `twitter`, `x`, `slack_oidc`, `spotify`, `workos`, `zoom`.
+# Sign in with Google (DNY's Workspace only). One-time setup in Google Cloud, done by tech@dnyhospitality.com:
+#   1. console.cloud.google.com, the app's OWN project "DNY Call to Action" in the DNY organisation (kept separate from the sales agent).
+#   2. APIs & Services > OAuth consent screen: audience "Internal", so only dnyhospitality.com accounts can
+#      finish the sign-in. App name "Call to Action", support email tech@dnyhospitality.com.
+#   3. Credentials > Create credentials > OAuth client ID, type "Web application", name "Call to Action".
+#      Authorised JavaScript origins: https://dny-call-to-action.vercel.app and http://localhost:3200
+#      Authorised redirect URI:       https://iaxjxefipmdumfukttvv.supabase.co/auth/v1/callback
+#   4. Save the client id and secret with `bash scripts/save-key.sh GOOGLE_CLIENT_ID` and
+#      `bash scripts/save-key.sh GOOGLE_CLIENT_SECRET`, then `npx supabase config push` reads them from
+#      .env.local through env() below. Never paste them into this file.
+# The login page also sends hd=dnyhospitality.com so Google's account picker shows work accounts first;
+# the real gate is the people table, checked in /auth/callback and on every request.
+[auth.external.google]
+enabled = true
+client_id = "env(GOOGLE_CLIENT_ID)"
+secret = "env(GOOGLE_CLIENT_SECRET)"
+redirect_uri = ""
+url = ""
+skip_nonce_check = false
+
 [auth.external.apple]
 enabled = false
 client_id = ""

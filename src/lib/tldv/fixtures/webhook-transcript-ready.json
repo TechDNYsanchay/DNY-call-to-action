@@ -1,0 +1,281 @@
+{
+  "id": "evt_01JBX5N4D8H2K6M1P9R3T7V5X0",
+  "event": "TranscriptReady",
+  "executedAt": "2026-11-03T06:04:17.000Z",
+  "data": {
+    "id": "6911a4c7d9e2f1a3b5c8d0e4",
+    "meetingId": "6911a3f0c2d4e8b1a7f93c21",
+    "data": [
+      {
+        "speaker": "Priya Nair",
+        "text": "Good morning everyone, thanks for joining the weekly review.",
+        "startTime": 4.0,
+        "endTime": 10.1
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Rakesh ji, aap sun paa rahe hain?",
+        "startTime": 11.3,
+        "endTime": 15.78
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Haan Priya, clearly sun raha hoon.",
+        "startTime": 16.98,
+        "endTime": 21.52
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Sunita bhi mere saath baithi hai, she is joining from my phone.",
+        "startTime": 22.72,
+        "endTime": 29.0
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Perfect, so three things today: occupancy, the F&B costing, and the duty roster.",
+        "startTime": 30.2,
+        "endTime": 37.5
+      },
+      {
+        "speaker": "Arjun Mehta",
+        "text": "October occupancy closed at 72 percent, up from 64 in September.",
+        "startTime": 38.7,
+        "endTime": 45.04
+      },
+      {
+        "speaker": "Arjun Mehta",
+        "text": "ARR was 4,850 rupees, slightly below the 5,000 target.",
+        "startTime": 46.24,
+        "endTime": 51.98
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Weekend pe toh full tha, weekdays mein problem hai.",
+        "startTime": 53.18,
+        "endTime": 58.74
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Yes, corporate weekday business is what we need to build.",
+        "startTime": 59.94,
+        "endTime": 65.86
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Arjun will share a corporate outreach list by Friday.",
+        "startTime": 67.06,
+        "endTime": 72.74
+      },
+      {
+        "speaker": "Arjun Mehta",
+        "text": "Haan, Friday tak bhej dunga, around forty companies in Udaipur and Ahmedabad.",
+        "startTime": 73.94,
+        "endTime": 81.06
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Theek hai, and please copy Sunita on that mail.",
+        "startTime": 82.26,
+        "endTime": 87.58
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Noted, Sunita will be copied.",
+        "startTime": 88.78,
+        "endTime": 93.02
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Next, the F&B costing model we discussed last month.",
+        "startTime": 94.22,
+        "endTime": 99.84
+      },
+      {
+        "speaker": "Arjun Mehta",
+        "text": "Food cost is running at 38 percent against a target of 32.",
+        "startTime": 156.04,
+        "endTime": 162.02
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Yeh bahut zyada hai, kitchen mein wastage ho raha hai kya?",
+        "startTime": 163.22,
+        "endTime": 169.2
+      },
+      {
+        "speaker": "Arjun Mehta",
+        "text": "Partly wastage, partly the banquet menu is priced too low for the portions.",
+        "startTime": 170.4,
+        "endTime": 177.4
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "We propose a revised banquet menu with new portion sizes and a 12 percent price revision.",
+        "startTime": 178.6,
+        "endTime": 186.44
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Twelve percent is okay for the December weddings, but not before Diwali bookings close.",
+        "startTime": 187.64,
+        "endTime": 195.36
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Agreed, so the revised menu applies to bookings taken from 15 November.",
+        "startTime": 196.56,
+        "endTime": 203.32
+      },
+      {
+        "speaker": "Arjun Mehta",
+        "text": "DNY will send the revised menu card and costing sheet by 10 November.",
+        "startTime": 204.52,
+        "endTime": 211.16
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Done, main 12 tak approve kar dunga.",
+        "startTime": 212.36,
+        "endTime": 217.02
+      },
+      {
+        "speaker": "Sunita Agarwal",
+        "text": "Ek baat, the vegetarian thali feedback was very good at the Sharma wedding.",
+        "startTime": 218.22,
+        "endTime": 225.22
+      },
+      {
+        "speaker": "Sunita Agarwal",
+        "text": "Please keep that thali in the new menu.",
+        "startTime": 226.42,
+        "endTime": 231.26
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Absolutely, we will keep it and maybe add a Rajasthani special.",
+        "startTime": 232.46,
+        "endTime": 238.74
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Third point, the duty roster for housekeeping.",
+        "startTime": 239.94,
+        "endTime": 245.2
+      },
+      {
+        "speaker": "Arjun Mehta",
+        "text": "We have two staff on long leave, so weekend coverage is thin.",
+        "startTime": 301.4,
+        "endTime": 307.56
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Do log aur hire kar lo, but salary 14,000 se zyada nahi.",
+        "startTime": 308.76,
+        "endTime": 314.62
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "We will put out the vacancies this week and share profiles with you.",
+        "startTime": 315.82,
+        "endTime": 322.4
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Interviews main khud lunga, Sunday ko hotel pe.",
+        "startTime": 323.6,
+        "endTime": 328.92
+      },
+      {
+        "speaker": "Arjun Mehta",
+        "text": "The GST filing for October is also due on the 20th, we need the bank statement from your side.",
+        "startTime": 330.12,
+        "endTime": 338.26
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Sunita, kal accountant se statement mangwa do.",
+        "startTime": 339.46,
+        "endTime": 344.72
+      },
+      {
+        "speaker": "Sunita Agarwal",
+        "text": "Haan, kal subah bhej dungi.",
+        "startTime": 345.92,
+        "endTime": 350.04
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "One risk to flag: the OTA commission on MakeMyTrip went up to 22 percent from this month.",
+        "startTime": 351.24,
+        "endTime": 359.08
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Yeh toh bahut hai, direct booking badhao.",
+        "startTime": 360.28,
+        "endTime": 365.24
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "We will push the website booking engine with a 5 percent direct discount, starting next week.",
+        "startTime": 366.44,
+        "endTime": 374.52
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Okay, try karo, but weekend rates mat girao.",
+        "startTime": 375.72,
+        "endTime": 380.86
+      },
+      {
+        "speaker": "Arjun Mehta",
+        "text": "Understood, the discount applies to weekday bookings only.",
+        "startTime": 382.06,
+        "endTime": 388.04
+      },
+      {
+        "speaker": "Sunita Agarwal",
+        "text": "Ek question, the lobby renovation, kab start hoga?",
+        "startTime": 389.24,
+        "endTime": 394.74
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "The contractor has not confirmed a date yet, we will chase him and revert.",
+        "startTime": 395.94,
+        "endTime": 402.88
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Please do, January se pehle ho jaana chahiye.",
+        "startTime": 404.08,
+        "endTime": 409.28
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Let us meet again next Monday, same time, 10:30.",
+        "startTime": 410.48,
+        "endTime": 415.86
+      },
+      {
+        "speaker": "Rakesh Agarwal",
+        "text": "Monday theek hai.",
+        "startTime": 417.06,
+        "endTime": 420.58
+      },
+      {
+        "speaker": "Priya Nair",
+        "text": "Thank you all, I will send the notes today.",
+        "startTime": 421.78,
+        "endTime": 426.86
+      },
+      {
+        "speaker": "Sunita Agarwal",
+        "text": "Thank you Priya, bye.",
+        "startTime": 428.06,
+        "endTime": 431.82
+      }
+    ]
+  }
+}

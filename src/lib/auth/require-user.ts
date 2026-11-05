@@ -1,5 +1,6 @@
 import "server-only";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import type { Database } from "@/lib/supabase/database.types";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
 
@@ -10,6 +11,9 @@ export type Person = Database["public"]["Tables"]["people"]["Row"];
  * Google only proves who someone is; an active row in `people` is what grants access.
  */
 export async function currentPerson(): Promise<Person | null> {
+  // The session is request-time data. Saying so here (not just reading the cookie) keeps the auth
+  // client's clock check out of the prerender pass; route handlers and actions are unaffected.
+  await connection();
   const supabase = await supabaseServer();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
@@ -33,6 +37,7 @@ export async function currentPerson(): Promise<Person | null> {
 
 /** Whether anyone is signed in at all (team member or not). */
 export async function isSignedIn(): Promise<boolean> {
+  await connection();
   const supabase = await supabaseServer();
   const { data } = await supabase.auth.getClaims();
   return Boolean(data?.claims?.sub);

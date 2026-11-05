@@ -3,6 +3,46 @@
 DNY Hospitality internal tool. Plan written 2026-11-04. Owner: Tarique (tech@dnyhospitality.com).
 Status: PLAN ONLY. Nothing has been created in any account yet.
 
+## 0. Update after Tarique's answers (2026-11-04, v1.1)
+
+These decisions replace the matching rows below. Everything else in the plan stands.
+
+- **Claude: Max plan, no API key.** The analysis runs as a Claude Code cloud routine on DNY's Claude Max plan,
+  exactly like the existing sales agent (dny-call-qa): the routine calls this app's `/api/agent/*` endpoints
+  with `AGENT_TOKEN` as a Bearer token, receives the next ready meeting as a package (metadata, participants,
+  transcript lines, result format), writes the sheet JSON, checks it with `?dryRun=1`, fixes errors, saves.
+  The server validates everything before storing (schema, quotes present in the transcript, owners, dates).
+  Cost: nothing beyond the Max subscription. Latency: cloud routines run at most hourly, so a sheet appears
+  within about an hour of the transcript being ready (plus tl;dv's own processing time), not in 3 to 5 minutes.
+  "Run now" exists on claude.ai/code/routines for urgent cases. A near-real-time trigger (a GitHub event firing
+  the routine when a transcript lands) is a phase-2 experiment.
+- **Sections 8 and 10 are therefore replaced**: no Anthropic SDK call, no Vercel Workflow SDK. The pipeline is:
+  webhook or cron tick stores the transcript and applies the rules; the meeting becomes `ready`; the routine
+  claims it (`claim_next_meeting`), classifies when the rules were undecided, writes the sheet; the server
+  checks and saves; stale claims are released by the cron (`release_stale_claims`).
+- **Classification by the routine**: when the rules cannot decide (unknown external domains, personal emails,
+  all-DNY invitee lists), the same routine classifies first, with the model used for the routine. Below the
+  confidence threshold the meeting goes to "Needs your decision".
+- **Accounts (confirmed)**: Supabase CLI is on tech@dnyhospitality.com's organisation; project
+  `dny-call-to-action` (ref `iaxjxefipmdumfukttvv`, Mumbai, micro compute) was created on 2026-11-04 and the
+  schema applied. Vercel: the DNY team used by dny-call-qa (Pro: it already runs 15-minute crons). GitHub: the
+  `TechDNYsanchay` organisation through the `github-dny` SSH host. One Supabase project for v1 (the sales agent
+  works the same way); a dev twin can be added later for about $10/month.
+- **tl;dv**: DNY is on a 7-day trial and will buy a plan; the sales agent already ingests the same tl;dv account.
+  This app registers its own webhook and uses the same account's API key (a new key or the existing one).
+  Both apps see every meeting; each processes only what its own classification says (sales agent: sales
+  conversations; this app: client meetings).
+- **Sales hand-off**: the sales agent already skips non-sales meetings itself, so the view
+  `v_sales_meetings_ready` is informational for now.
+- **Google**: this app gets its OWN Google Cloud project and OAuth client (Tarique wants it fully separate from
+  the sales agent). Nothing is shared with dny-call-qa except the company tl;dv account.
+- **ERP**: the ERP lives in GitHub repo TechDNYsanchay/dny-erp (Supabase projects dny-erp-dev / dny-erp-staging exist
+  in the same Supabase org). The integration contract is written from that code (see section 15).
+- **First real meeting**: a client meeting is expected on 4 or 5 November 2026; it becomes the first real sheet
+  and the start of the eval set.
+- **Stack**: same as dny-call-qa (Next.js 16.4, React 19.3, Tailwind v4, Supabase SSR, zod 4, vitest, npm),
+  dev server on port 3200. Design language "Shift Sheet" (section 12) unchanged.
+
 ## 1. What we are building
 
 Every client meeting recorded by tl;dv becomes, within minutes of the transcript being ready, a one-page
@@ -27,10 +67,10 @@ zero meetings). It is unused and not part of this plan; the app talks to tl;dv's
 
 | Area | Decision | Why |
 |---|---|---|
-| LLM access | Anthropic API key in a DNY Console organisation, with a monthly spend cap. Not the Claude Max subscription. | Max covers Claude.ai and Claude Code only; a server app needs the API. Cost is about $0.25 to $0.35 per client meeting. |
+| LLM access | SUPERSEDED by section 0: Claude Code cloud routine on the Claude Max plan, no API key. (Originally: Anthropic API key with a spend cap.) | Max covers Claude.ai and Claude Code only; a server app needs the API. Cost is about $0.25 to $0.35 per client meeting. |
 | Extraction model | `claude-opus-5-5`, effort `medium`, streaming, structured outputs, max_tokens 32000. Raise to `high` only if the first 20 reviewed pages show misses. | The sheet is the product; Opus 5.5 is the least likely to invent owners, dates or amounts. |
 | Classification model | Deterministic rules first, then `claude-sonnet-5-5` at effort `low` (about $0.02 per call). | Needs to read Hinglish and judge "existing client vs prospect"; Haiku saving is not worth the risk. |
-| Orchestration | Vercel Workflow SDK, steps written as plain functions. Fallback: plain route + cron re-drive, decided in the day-0 spike. | Per-step retries and a dashboard trace; free at this volume. |
+| Orchestration | SUPERSEDED by section 0: webhook + cron tick on Vercel, routine pulls work through /api/agent/*. (Originally: Vercel Workflow SDK.) | Per-step retries and a dashboard trace; free at this volume. |
 | Webhook trust | tl;dv webhooks are hints only; the app always re-fetches meeting and transcript through the API. | tl;dv has no webhook signature; TranscriptReady can arrive before MeetingReady. |
 | Schedules | One cron tick every 10 minutes (sync, transcript retries, stale-run re-drive, enqueue up to 5). | One lock, one log, one secret. Requires Vercel Pro. |
 | Auth | Supabase Auth + Google only. Google OAuth client with audience Internal (dnyhospitality.com Workspace). Domain and provider re-checked in the callback. Admin = row in `team_members`. | Simple, instant revocation, nothing a stray Gmail can do. |
@@ -43,7 +83,7 @@ zero meetings). It is unused and not part of this plan; the app talks to tl;dv's
 | ERP | Only `erp_task_id` and `erp_sync_status` columns now; a one-page contract after reading the ERP repo; manual "Push to ERP" dialog first. | ERP stack and task model are unknown. |
 | Sales hand-off | Meetings labelled `sales` are exposed through the view `v_sales_meetings_ready`; the sales agent reads it. | No HTTP coupling, no double processing. |
 | Notifications | In-app queue + one email per sheet to DNY attendees (headline, counts, link; no item text), opt-out per person, plus a "needs your decision" email. | Avoids the inbox flood that makes people filter the tool out. |
-| Environments | Two Supabase projects: `cta-dev` (Free, local + previews) and `cta-prod` (Pro). Additive migrations; production `db push` is manual. | Previews must never touch client transcripts. |
+| Environments | One Supabase project `dny-call-to-action` for v1 (as the sales agent does); a dev twin later if needed. Additive migrations; `db push --remote` by hand. | Previews must never touch client transcripts. |
 
 ## 3. Day-0 spike (half a day, before any code)
 
@@ -171,7 +211,7 @@ Labels: `client | sales | internal | other`, with `type_source = rule | llm | hu
 7. Phase 2 (after 30 real meetings): prospect/vendor domain lists, title keyword priors, nightly promotion of
    domains after repeated confirmations, roster suggestions, accuracy tiles.
 
-## 8. Extraction (the call to action)
+## 8. Extraction (the call to action) — model call details superseded by section 0; the schema, transcript formatting and server checks stand
 
 Request (TypeScript, `@anthropic-ai/sdk`):
 
@@ -265,11 +305,11 @@ Auth and RLS:
 - Google OAuth client audience Internal; callback route checks `email` ends with `@dnyhospitality.com` and
   `provider = google`, otherwise signs out and deletes the stray user. "Before User Created" hook added as an
   extra gate if the plan offers it. Project switched to asymmetric (ECC) JWT keys so `getClaims()` in `proxy.ts`
-  verifies locally. Admin "Deactivate" sets `active = false` and deletes the auth user.
+  verifies locally. Admin "Deactivate" sets `active = false` and bans the auth user (re-activation keeps the same id).
 - Visibility question for DNY management (open): whether escalation, payroll or HR meetings must be restricted
   to account owners and management. The policies live in one helper so tightening later is one change.
 
-## 10. Processing and guards
+## 10. Processing and guards — Workflow SDK parts superseded by section 0; the guards stand
 
 `workflows/process-meeting.ts` ('use workflow'): `markRun` -> `fetchTranscript` -> `classify` -> (client only)
 `extract` -> `verifyAndStore` -> `notify` -> `finishRun`. Every step reads and writes Postgres itself and
@@ -407,7 +447,7 @@ Then: `ErpAdapter` interface (`upsertTask`, `updateTaskStatus`, `healthcheck`), 
 field and idempotency key, a manual "Push to ERP" dialog previewing exactly which rows go (needs-check rows
 excluded), per-row results, retries; later an outbox drained by the cron tick and a status callback route.
 
-## 16. Costs (one table)
+## 16. Costs (one table) — superseded by section 0: no per-meeting LLM cost on the Max plan; platform costs stand
 
 Prices: Opus 5.5 $4 / $20 per million input / output tokens; Sonnet 5.5 $2 / $10; cache reads $0.20.
 

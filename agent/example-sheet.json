@@ -1,0 +1,416 @@
+{
+  "headline": "Saffron Court approved the new F&B costing model, but the owner demanded the late MIS be fixed: October MIS by Thursday and weekly MIS every Monday.",
+  "executive_summary": [
+    "The owner is frustrated that the September MIS arrived on 18 October; DNY committed to the October MIS by Thursday 5 November, monthly MIS by the 5th, and weekly MIS every Monday before 10 am, and he will escalate if the 5th is missed again.",
+    "The F&B costing model (per-cover menu costing, portion sheets, weekly vendor rate comparison) was approved; F&B cost is 38% against a 32% target and F&B payroll has risen to 5.5 lakh a month.",
+    "Occupancy reached 72% at an ARR of 4,200 with 48% of bookings from OTAs; DNY will bring a direct-booking plan and the New Year package proposal to the next review on 11 November."
+  ],
+  "meeting_purpose": "review",
+  "language_profile": {
+    "primary": "hinglish",
+    "mixed": true,
+    "notes": "The client side spoke mostly Hinglish, the DNY side mostly English; amounts were said in lakh."
+  },
+  "action_items": [
+    {
+      "id": "A1",
+      "title": "Send October MIS to the owner",
+      "details": "The September MIS reached the owner on 18 October. The October MIS goes out this Thursday and from then on the monthly MIS reaches the owner by the 5th of every month.",
+      "owed_by": "dny",
+      "owner": { "name": null, "side": "dny", "basis": "not_stated" },
+      "due": { "kind": "relative_phrase", "date": "2026-11-05", "raw_phrase": "this Thursday", "basis": "meeting on Wed 4 Nov; this Thursday = 5 Nov, confirmed by the owner as '5 tareekh'" },
+      "priority": "high",
+      "linked_decision_id": "D2",
+      "evidence": [
+        { "timestamp": "12:03", "speaker": "Arjun Mehta", "quote": "We will send the October MIS this Thursday. And going forward the monthly MIS will reach you by the 5th of every month, no later.", "quote_english": null },
+        { "timestamp": "12:31", "speaker": "Rakesh Agarwal", "quote": "Thursday matlab 5 tareekh. Theek hai.", "quote_english": "Thursday means the 5th. Fine." }
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "A2",
+      "title": "Share revised duty roster for all departments",
+      "details": "Front office staff are working double shifts and guests have complained. The redone roster covers every department, including housekeeping, in one file; Sunita marks changes before it goes live.",
+      "owed_by": "dny",
+      "owner": { "name": "Arjun Mehta", "side": "dny", "basis": "volunteered" },
+      "due": { "kind": "relative_phrase", "date": "2026-11-06", "raw_phrase": "by Friday", "basis": "meeting on Wed 4 Nov; Friday = 6 Nov" },
+      "priority": "high",
+      "linked_decision_id": null,
+      "evidence": [
+        { "timestamp": "17:11", "speaker": "Arjun Mehta", "quote": "I will share the revised duty roster with you both by Friday, Sunita, and you can mark changes before it goes live.", "quote_english": null }
+      ],
+      "confidence": 0.93
+    },
+    {
+      "id": "A3",
+      "title": "Approve the kitchen exhaust quote",
+      "details": "The 2.4 lakh quote has been pending on the client side while two vendors were compared. The exhaust was also flagged by the FSSAI inspector.",
+      "owed_by": "client",
+      "owner": { "name": "Rakesh Agarwal", "side": "client", "basis": "volunteered" },
+      "due": { "kind": "relative_phrase", "date": "2026-11-06", "raw_phrase": "Friday tak", "basis": "meeting on Wed 4 Nov; Friday = 6 Nov" },
+      "priority": "medium",
+      "linked_decision_id": null,
+      "evidence": [
+        { "timestamp": "8:46", "speaker": "Rakesh Agarwal", "quote": "Main is hafte approve kar deta hoon, Friday tak confirm kar dunga.", "quote_english": "I will approve it this week, I will confirm by Friday." }
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "A4",
+      "title": "Send department-wise payroll breakup with reasons",
+      "details": "The owner wants the payroll split by department in the MIS and an explanation of why F&B payroll rose from 4 lakh to 5.5 lakh. Goes out with the October MIS.",
+      "owed_by": "dny",
+      "owner": { "name": "Arjun Mehta", "side": "dny", "basis": "volunteered" },
+      "due": { "kind": "relative_phrase", "date": "2026-11-05", "raw_phrase": "along with the MIS", "basis": "the October MIS is due this Thursday, 5 Nov" },
+      "priority": "medium",
+      "linked_decision_id": null,
+      "evidence": [
+        { "timestamp": "15:39", "speaker": "Arjun Mehta", "quote": "I will send the breakup with reasons along with the MIS.", "quote_english": null },
+        { "timestamp": "14:13", "speaker": "Sunita Rao", "quote": "MIS mein payroll ka breakup bhi chahiye department wise.", "quote_english": "The MIS also needs the payroll breakup by department." }
+      ],
+      "confidence": 0.88
+    },
+    {
+      "id": "A5",
+      "title": "Send revised menu costing with new vendor rates",
+      "details": "Follows the approved costing model. Any menu price change still needs the owner's approval before it goes live.",
+      "owed_by": "dny",
+      "owner": { "name": null, "side": "dny", "basis": "not_stated" },
+      "due": { "kind": "explicit_date", "date": "2026-11-10", "raw_phrase": "by the 10th", "basis": "meeting on 4 Nov; the 10th = 10 Nov" },
+      "priority": "medium",
+      "linked_decision_id": "D1",
+      "evidence": [
+        { "timestamp": "7:41", "speaker": "Priya Nair", "quote": "We will send the revised menu costing with the new rates by the 10th.", "quote_english": null }
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "A6",
+      "title": "Move weekly MIS to Monday before 10 am",
+      "details": "Weekly MIS currently goes out on Wednesdays. From next week it reaches the owner every Monday before 10 am, ahead of his meeting with department heads.",
+      "owed_by": "dny",
+      "owner": { "name": null, "side": "dny", "basis": "not_stated" },
+      "due": { "kind": "relative_phrase", "date": "2026-11-09", "raw_phrase": "starting next week", "basis": "meeting on Wed 4 Nov; the first Monday of next week = 9 Nov" },
+      "priority": "high",
+      "linked_decision_id": "D2",
+      "evidence": [
+        { "timestamp": "13:45", "speaker": "Priya Nair", "quote": "Weekly MIS moves to Monday, before 10 am, starting next week.", "quote_english": null }
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "A7",
+      "title": "Send layout drawing from the architect for FSSAI renewal",
+      "details": "Needed with the water test report (already with the client) so DNY can file the FSSAI licence renewal due on 30 November.",
+      "owed_by": "client",
+      "owner": { "name": "Sunita Rao", "side": "client", "basis": "explicitly_assigned" },
+      "due": { "kind": "relative_phrase", "date": null, "raw_phrase": "agle hafte tak", "basis": "'by next week' names no day; left open" },
+      "priority": "medium",
+      "linked_decision_id": null,
+      "evidence": [
+        { "timestamp": "18:54", "speaker": "Rakesh Agarwal", "quote": "layout drawing architect se lena padega. Sunita, tum architect ko bolo.", "quote_english": "the layout drawing has to come from the architect. Sunita, you tell the architect." },
+        { "timestamp": "19:17", "speaker": "Sunita Rao", "quote": "main architect se drawing le kar Priya ko bhej dungi, agle hafte tak.", "quote_english": "I will get the drawing from the architect and send it to Priya, by next week." }
+      ],
+      "confidence": 0.88
+    },
+    {
+      "id": "A8",
+      "title": "Run internal FSSAI audit of the kitchen before the inspection",
+      "details": "In the third week of November, before the 20th; Arjun confirms the exact date with the chef.",
+      "owed_by": "dny",
+      "owner": { "name": null, "side": "dny", "basis": "not_stated" },
+      "due": { "kind": "relative_phrase", "date": "2026-11-20", "raw_phrase": "before the 20th", "basis": "meeting in Nov 2026; the 20th = 20 Nov" },
+      "priority": "medium",
+      "linked_decision_id": null,
+      "evidence": [
+        { "timestamp": "19:41", "speaker": "Priya Nair", "quote": "We will also run an internal FSSAI audit of the kitchen before the inspector comes.", "quote_english": null },
+        { "timestamp": "20:19", "speaker": "Arjun Mehta", "quote": "In the third week of November, before the 20th.", "quote_english": null }
+      ],
+      "confidence": 0.85
+    },
+    {
+      "id": "A9",
+      "title": "Share list of banquet invoices with wrong GST rate",
+      "details": "The client's CA says some October banquet invoices carry 18% GST instead of 12%. DNY checks with the banquet team and corrects the invoices and the return if the error is DNY's.",
+      "owed_by": "client",
+      "owner": { "name": "Rakesh Agarwal", "side": "client", "basis": "volunteered" },
+      "due": { "kind": "none_stated", "date": null, "raw_phrase": null, "basis": null },
+      "priority": "high",
+      "linked_decision_id": null,
+      "evidence": [
+        { "timestamp": "21:53", "speaker": "Rakesh Agarwal", "quote": "Haan, main CA ko bolta hoon, woh list bhej dega.", "quote_english": "Yes, I will tell the CA, he will send the list." }
+      ],
+      "confidence": 0.85
+    },
+    {
+      "id": "A10",
+      "title": "Check cost impact of South Indian breakfast items",
+      "details": "Guest reviews ask for more South Indian breakfast; the chef can add idli, vada and a weekend dosa counter once the cost is known.",
+      "owed_by": "dny",
+      "owner": { "name": "Arjun Mehta", "side": "dny", "basis": "volunteered" },
+      "due": { "kind": "none_stated", "date": null, "raw_phrase": null, "basis": null },
+      "priority": "low",
+      "linked_decision_id": null,
+      "evidence": [
+        { "timestamp": "23:15", "speaker": "Arjun Mehta", "quote": "Let me check the cost impact first and come back to you.", "quote_english": null }
+      ],
+      "confidence": 0.85
+    },
+    {
+      "id": "A11",
+      "title": "Send front-office SOP training calendar in two batches",
+      "details": "The October training was postponed for the wedding season. It runs in November in two batches so the desk is never empty; the calendar goes out with the roster.",
+      "owed_by": "dny",
+      "owner": { "name": null, "side": "dny", "basis": "not_stated" },
+      "due": { "kind": "relative_phrase", "date": "2026-11-06", "raw_phrase": "on Friday", "basis": "meeting on Wed 4 Nov; Friday = 6 Nov" },
+      "priority": "low",
+      "linked_decision_id": "D3",
+      "evidence": [
+        { "timestamp": "25:15", "speaker": "Arjun Mehta", "quote": "We will send the training calendar along with the roster on Friday.", "quote_english": null }
+      ],
+      "confidence": 0.85
+    },
+    {
+      "id": "A12",
+      "title": "Bring direct-booking plan and New Year package proposal to the next review",
+      "details": "A direct-booking plan with website changes and a corporate rate card, to reduce the 48% OTA share, plus the December New Year package proposal.",
+      "owed_by": "dny",
+      "owner": { "name": null, "side": "dny", "basis": "not_stated" },
+      "due": { "kind": "relative_phrase", "date": "2026-11-11", "raw_phrase": "before the next review", "basis": "the next review was fixed for Wednesday 11 Nov" },
+      "priority": "medium",
+      "linked_decision_id": null,
+      "evidence": [
+        { "timestamp": "4:11", "speaker": "Priya Nair", "quote": "DNY will prepare a direct-booking plan with the website changes and a corporate rate card, and share it with you before the next review.", "quote_english": null },
+        { "timestamp": "26:07", "speaker": "Priya Nair", "quote": "Let us bring the New Year package proposal to the next review.", "quote_english": null }
+      ],
+      "confidence": 0.85
+    },
+    {
+      "id": "A13",
+      "title": "Reduce casual banquet staff in November",
+      "details": "The owner said casual staff must come down in November after seeing the payroll rise; nobody was named and no date was given.",
+      "owed_by": "dny",
+      "owner": { "name": null, "side": "dny", "basis": "not_stated" },
+      "due": { "kind": "relative_phrase", "date": null, "raw_phrase": "November mein", "basis": "'in November' names no day; left open" },
+      "priority": "medium",
+      "linked_decision_id": null,
+      "evidence": [
+        { "timestamp": "16:15", "speaker": "Rakesh Agarwal", "quote": "Lekin casual staff kam karna padega November mein.", "quote_english": "But casual staff will have to be reduced in November." }
+      ],
+      "confidence": 0.55
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "statement": "The new F&B costing model is approved; any menu price change needs the owner's approval first.",
+      "decided_by": "client",
+      "evidence": [
+        { "timestamp": "7:09", "speaker": "Rakesh Agarwal", "quote": "Chalo isko approve karte hain, lekin menu pricing mein koi badlav mere approval ke bina nahi hoga.", "quote_english": "Let us approve it, but no change in menu pricing will happen without my approval." }
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "D2",
+      "statement": "Weekly MIS moves to Monday before 10 am and the monthly MIS reaches the owner by the 5th of every month.",
+      "decided_by": "joint",
+      "evidence": [
+        { "timestamp": "13:25", "speaker": "Rakesh Agarwal", "quote": "Weekly MIS har Somvar ko aana chahiye, 10 baje se pehle.", "quote_english": "The weekly MIS should come every Monday, before 10 o'clock." },
+        { "timestamp": "12:03", "speaker": "Arjun Mehta", "quote": "going forward the monthly MIS will reach you by the 5th of every month, no later.", "quote_english": null }
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "D3",
+      "statement": "Front-office SOP training runs in November in two batches so the desk is never left empty.",
+      "decided_by": "joint",
+      "evidence": [
+        { "timestamp": "24:52", "speaker": "Sunita Rao", "quote": "November mein kar lete hain, lekin do batches mein, taaki desk khaali na rahe.", "quote_english": "Let us do it in November, but in two batches, so the desk does not stay empty." }
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "key_facts": [
+    {
+      "id": "F1",
+      "fact": "October occupancy was 72%, up from 65% in September.",
+      "category": "metric",
+      "normalized_value": "72%",
+      "evidence": [{ "timestamp": "1:54", "speaker": "Arjun Mehta", "quote": "October occupancy closed at 72 percent against 65 in September.", "quote_english": null }],
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "fact": "Average room rate was 4,200 rupees and RevPAR about 3,024.",
+      "category": "money",
+      "normalized_value": "INR 4200 ARR; INR 3024 RevPAR",
+      "evidence": [{ "timestamp": "1:54", "speaker": "Arjun Mehta", "quote": "Average room rate was 4,200 rupees, so RevPAR came to about 3,024.", "quote_english": null }],
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "fact": "48% of October bookings came through OTAs.",
+      "category": "metric",
+      "normalized_value": "48%",
+      "evidence": [{ "timestamp": "3:11", "speaker": "Arjun Mehta", "quote": "OTA share was 48 percent.", "quote_english": null }],
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "fact": "F&B cost was 38% of F&B revenue in October against a target of 32%.",
+      "category": "metric",
+      "normalized_value": "38% (target 32%)",
+      "evidence": [{ "timestamp": "5:18", "speaker": "Arjun Mehta", "quote": "F&B cost in October was 38 percent of F&B revenue. Our target is 32.", "quote_english": null }],
+      "confidence": 0.95
+    },
+    {
+      "id": "F5",
+      "fact": "The kitchen exhaust quote is 2 lakh 40 thousand rupees.",
+      "category": "money",
+      "normalized_value": "INR 240000",
+      "evidence": [{ "timestamp": "8:46", "speaker": "Rakesh Agarwal", "quote": "Haan, woh 2 lakh 40 hazaar ka quote.", "quote_english": "Yes, that quote of 2 lakh 40 thousand." }],
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "fact": "F&B payroll is running at saade paanch lakh (5.5 lakh) a month, up from 4 lakh last year.",
+      "category": "money",
+      "normalized_value": "INR 550000 per month",
+      "evidence": [
+        { "timestamp": "14:42", "speaker": "Arjun Mehta", "quote": "the F&B payroll alone is running at saade paanch lakh per month", "quote_english": "the F&B payroll alone is running at five and a half lakh per month" },
+        { "timestamp": "15:15", "speaker": "Rakesh Agarwal", "quote": "Pichle saal yeh char lakh tha.", "quote_english": "Last year this was four lakh." }
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "fact": "The FSSAI licence renewal is due on 30 November.",
+      "category": "date",
+      "normalized_value": "2026-11-30",
+      "evidence": [{ "timestamp": "18:21", "speaker": "Priya Nair", "quote": "The FSSAI licence renewal is due on 30 November.", "quote_english": null }],
+      "confidence": 0.95
+    },
+    {
+      "id": "F8",
+      "fact": "The TripAdvisor rating fell from 4.1 to 3.9 this month.",
+      "category": "metric",
+      "normalized_value": "3.9 (from 4.1)",
+      "evidence": [{ "timestamp": "23:47", "speaker": "Rakesh Agarwal", "quote": "TripAdvisor rating 4.1 se 3.9 ho gayi hai is mahine.", "quote_english": "The TripAdvisor rating has gone from 4.1 to 3.9 this month." }],
+      "confidence": 0.9
+    },
+    {
+      "id": "F9",
+      "fact": "The September MIS reached the owner on 18 October.",
+      "category": "date",
+      "normalized_value": "2026-10-18",
+      "evidence": [{ "timestamp": "10:02", "speaker": "Rakesh Agarwal", "quote": "September ka MIS mujhe 18 October ko mila. Yeh bahut late hai.", "quote_english": "I got the September MIS on 18 October. This is very late." }],
+      "confidence": 0.95
+    }
+  ],
+  "risks": [
+    {
+      "id": "R1",
+      "description": "The owner will escalate if the monthly MIS is late again; the September report arrived on the 18th and he called the pattern repeated.",
+      "severity": "high",
+      "affects": "dny",
+      "mitigation_discussed": "October MIS by Thursday 5 November, monthly MIS by the 5th from then on, weekly MIS every Monday.",
+      "evidence": [
+        { "timestamp": "27:15", "speaker": "Rakesh Agarwal", "quote": "Agar 5 tareekh tak nahi aaya toh main escalate karunga.", "quote_english": "If it does not come by the 5th, I will escalate." }
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "R2",
+      "description": "Some October banquet invoices carry 18% GST instead of 12%, which could mean corrected invoices and an amended return before the filing date.",
+      "severity": "high",
+      "affects": "client",
+      "mitigation_discussed": "The client's CA sends the list; DNY corrects the invoices and the return if the error is in DNY's billing.",
+      "evidence": [
+        { "timestamp": "20:57", "speaker": "Rakesh Agarwal", "quote": "October ke kuch banquet invoices mein GST galat laga hai, 12 ki jagah 18 percent.", "quote_english": "GST has been charged wrongly on some October banquet invoices, 18 percent instead of 12." }
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "R3",
+      "description": "Front office staff are working double shifts and guests have started complaining.",
+      "severity": "medium",
+      "affects": "client",
+      "mitigation_discussed": "A revised duty roster for all departments by Friday.",
+      "evidence": [
+        { "timestamp": "16:45", "speaker": "Sunita Rao", "quote": "Front office mein log double shift kar rahe hain, complaints aa rahi hain.", "quote_english": "People in the front office are doing double shifts, complaints are coming in." }
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "R4",
+      "description": "Guest reviews are slipping: the TripAdvisor rating fell to 3.9 and reviews ask for more South Indian breakfast items.",
+      "severity": "medium",
+      "affects": "client",
+      "mitigation_discussed": "Rating tracked weekly in the MIS; the chef may add idli, vada and a weekend dosa counter once the cost is checked.",
+      "evidence": [
+        { "timestamp": "22:48", "speaker": "Sunita Rao", "quote": "Breakfast buffet mein South Indian items kam hain, kaafi reviews mein likha hai.", "quote_english": "There are few South Indian items in the breakfast buffet, many reviews mention it." }
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "Q1",
+      "question": "Why did F&B payroll rise from 4 lakh to 5.5 lakh a month, and how much of it is seasonal?",
+      "raised_by": "client",
+      "needs_answer_from": "dny",
+      "evidence": [{ "timestamp": "15:15", "speaker": "Rakesh Agarwal", "quote": "Saade paanch lakh? Pichle saal yeh char lakh tha. Itna kyun badha?", "quote_english": "Five and a half lakh? Last year this was four lakh. Why did it rise so much?" }],
+      "confidence": 0.9
+    },
+    {
+      "id": "Q2",
+      "question": "What is the cost impact of adding South Indian items and a weekend dosa counter to the breakfast buffet?",
+      "raised_by": "dny",
+      "needs_answer_from": "dny",
+      "evidence": [{ "timestamp": "23:15", "speaker": "Arjun Mehta", "quote": "The chef can add idli, vada and a dosa counter on weekends. Let me check the cost impact first", "quote_english": null }],
+      "confidence": 0.85
+    },
+    {
+      "id": "Q3",
+      "question": "When will the New Year package plan for December be ready?",
+      "raised_by": "client",
+      "needs_answer_from": "dny",
+      "evidence": [{ "timestamp": "25:43", "speaker": "Rakesh Agarwal", "quote": "December mein humein New Year package launch karna hai, uska plan kab milega?", "quote_english": "We have to launch a New Year package in December, when will we get its plan?" }],
+      "confidence": 0.85
+    }
+  ],
+  "next_meeting": {
+    "mentioned": true,
+    "date": "2026-11-11",
+    "raw_phrase": "next Wednesday the 11th at 10:30",
+    "purpose": "Next review: direct-booking plan and New Year package proposal.",
+    "evidence": [
+      { "timestamp": "26:45", "speaker": "Priya Nair", "quote": "Same slot, next Wednesday the 11th at 10:30, if that works for everyone.", "quote_english": null },
+      { "timestamp": "27:15", "speaker": "Rakesh Agarwal", "quote": "Agle Budhvar theek hai.", "quote_english": "Next Wednesday is fine." }
+    ],
+    "confidence": 0.95
+  },
+  "client_sentiment": {
+    "label": "mixed",
+    "summary": "The owner was frustrated about the late MIS and warned he would escalate, while both client participants were happy with the numbers, the costing model and the new chef.",
+    "drivers": ["frustrated about delayed MIS", "approved the F&B costing model", "praised the new chef", "worried about payroll rise and rating drop"],
+    "evidence": [
+      { "timestamp": "11:39", "speaker": "Rakesh Agarwal", "quote": "Sorry se kaam nahi chalega Priya. Mujhe fix chahiye.", "quote_english": "Sorry will not do, Priya. I need a fix." },
+      { "timestamp": "28:12", "speaker": "Sunita Rao", "quote": "New chef ka khana guests ko pasand aa raha hai, woh ek acchi baat hai.", "quote_english": "Guests like the new chef's food, that is a good thing." }
+    ],
+    "confidence": 0.9
+  },
+  "participants": [
+    { "speaker_label": "Priya Nair", "name": "Priya Nair", "side": "dny", "role_guess": "DNY account manager", "confidence": 0.95 },
+    { "speaker_label": "Arjun Mehta", "name": "Arjun Mehta", "side": "dny", "role_guess": "DNY operations", "confidence": 0.95 },
+    { "speaker_label": "Rakesh Agarwal", "name": "Rakesh Agarwal", "side": "client", "role_guess": "owner", "confidence": 0.95 },
+    { "speaker_label": "Sunita Rao", "name": "Sunita Rao", "side": "client", "role_guess": "GM", "confidence": 0.9 }
+  ],
+  "quality": {
+    "transcript_quality": "good",
+    "speaker_labels_reliable": true,
+    "issues": [],
+    "unresolved_references": ["'the 5th' for the monthly MIS was not tied to a first month explicitly; taken as from November onwards"]
+  },
+  "overall_confidence": 0.88
+}

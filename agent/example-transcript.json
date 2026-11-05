@@ -1,0 +1,368 @@
+[
+ {
+  "speaker": "Priya Nair",
+  "startSec": 30.0,
+  "endSec": 38.2,
+  "text": "Good morning everyone, thank you for joining. Rakesh ji, Sunita, can you hear us properly?"
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 52.2,
+  "endSec": 62.7,
+  "text": "Haan Priya, awaaz aa rahi hai. Chalo shuru karte hain, mere paas saade gyarah baje tak ka time hai."
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 74.7,
+  "endSec": 92.9,
+  "text": "Perfect. This is the October review for Saffron Court. Agenda is occupancy and revenue, the F&B costing model, the MIS reports, staffing, and then open points. Arjun will take us through the numbers."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 114.9,
+  "endSec": 128.1,
+  "text": "Thanks Priya. October occupancy closed at 72 percent against 65 in September. Average room rate was 4,200 rupees, so RevPAR came to about 3,024."
+ },
+ {
+  "speaker": "Sunita Rao",
+  "startSec": 158.1,
+  "endSec": 171.3,
+  "text": "72 percent is good, the wedding season helped. But OTA share badhti ja rahi hai, almost half the bookings MakeMyTrip aur Goibibo se aaye."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 191.3,
+  "endSec": 206.2,
+  "text": "Yes, OTA share was 48 percent. Commission on that is eating into the rate. We want to push direct bookings through the website and the corporate tie-ups."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 228.2,
+  "endSec": 236.4,
+  "text": "Theek hai, lekin direct booking ke liye website pe kaam karna padega. Woh kaun karega?"
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 251.4,
+  "endSec": 266.8,
+  "text": "We will take that. DNY will prepare a direct-booking plan with the website changes and a corporate rate card, and share it with you before the next review."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 291.8,
+  "endSec": 298.4,
+  "text": "Okay. Ab F&B pe aate hain, kyunki wahi sabse bada sawaal hai."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 318.4,
+  "endSec": 334.4,
+  "text": "Sure. F&B cost in October was 38 percent of F&B revenue. Our target is 32. The gap is mostly in banquet wastage and the fruit and vegetable vendor rates."
+ },
+ {
+  "speaker": "Sunita Rao",
+  "startSec": 356.4,
+  "endSec": 365.2,
+  "text": "Banquet wastage kaafi hai, maine khud dekha hai. Buffet ke baad bahut khana bach jaata hai."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 383.2,
+  "endSec": 399.2,
+  "text": "We are proposing the new costing model: menu costing per cover, portion control sheets, and a weekly vendor rate comparison. The chef has already started on the portion sheets."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 429.2,
+  "endSec": 441.9,
+  "text": "Yeh costing model mujhe pasand hai. Chalo isko approve karte hain, lekin menu pricing mein koi badlav mere approval ke bina nahi hoga."
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 461.9,
+  "endSec": 477.9,
+  "text": "Understood. The costing model is approved and any menu price change comes to you first. We will send the revised menu costing with the new rates by the 10th."
+ },
+ {
+  "speaker": "Sunita Rao",
+  "startSec": 497.9,
+  "endSec": 508.9,
+  "text": "Priya, ek aur baat. Kitchen exhaust ka quote jo aapne bheja tha, woh abhi tak pending hai humari taraf se."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 526.9,
+  "endSec": 541.2,
+  "text": "Haan, woh 2 lakh 40 hazaar ka quote. Mujhe do vendors compare karne the. Main is hafte approve kar deta hoon, Friday tak confirm kar dunga."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 563.2,
+  "endSec": 574.2,
+  "text": "Thank you. The exhaust is also an FSSAI point, the inspector flagged ventilation last time, so the sooner the better."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 602.2,
+  "endSec": 614.3,
+  "text": "Ab MIS ki baat karte hain. Mujhe seedha bolna hai, September ka MIS mujhe 18 October ko mila. Yeh bahut late hai."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 630.3,
+  "endSec": 643.5,
+  "text": "Agar mujhe mahine ke beech mein pata chalega ki pichle mahine kya hua, toh main decision kaise lunga? Yeh baar baar ho raha hai."
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 663.5,
+  "endSec": 681.7,
+  "text": "You are right, Rakesh ji, and I am sorry about that. The delay was on our side, the night audit data came late from the property and our team did not chase it."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 699.7,
+  "endSec": 707.4,
+  "text": "Sorry se kaam nahi chalega Priya. Mujhe fix chahiye. October ka MIS kab milega?"
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 723.4,
+  "endSec": 737.2,
+  "text": "We will send the October MIS this Thursday. And going forward the monthly MIS will reach you by the 5th of every month, no later."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 751.2,
+  "endSec": 756.2,
+  "text": "Thursday matlab 5 tareekh. Theek hai. Aur weekly MIS?"
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 776.2,
+  "endSec": 791.1,
+  "text": "Weekly MIS currently goes on Wednesdays. We propose moving it to Monday morning so you see the previous week before your Monday meeting with the department heads."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 805.1,
+  "endSec": 813.3,
+  "text": "Haan, Monday better hai. Weekly MIS har Somvar ko aana chahiye, 10 baje se pehle."
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 825.3,
+  "endSec": 831.9,
+  "text": "Done. Weekly MIS moves to Monday, before 10 am, starting next week."
+ },
+ {
+  "speaker": "Sunita Rao",
+  "startSec": 853.9,
+  "endSec": 862.1,
+  "text": "Priya, MIS mein payroll ka breakup bhi chahiye department wise. Abhi sirf total aata hai."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 882.1,
+  "endSec": 901.3,
+  "text": "We can add that. Just so everyone has the number, the F&B payroll alone is running at saade paanch lakh per month, which is about 5.5 lakh, because of the extra banquet staff in October."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 915.3,
+  "endSec": 921.9,
+  "text": "Saade paanch lakh? Pichle saal yeh char lakh tha. Itna kyun badha?"
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 939.9,
+  "endSec": 955.3,
+  "text": "Partly the wedding season casuals, partly two new positions, the banquet manager and the second sous chef. I will send the breakup with reasons along with the MIS."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 975.3,
+  "endSec": 983.5,
+  "text": "Theek hai, breakup dekh ke baat karenge. Lekin casual staff kam karna padega November mein."
+ },
+ {
+  "speaker": "Sunita Rao",
+  "startSec": 1005.5,
+  "endSec": 1015.4,
+  "text": "Duty roster bhi dekhna hai. Front office mein log double shift kar rahe hain, complaints aa rahi hain."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 1031.4,
+  "endSec": 1046.3,
+  "text": "We have redone the roster. I will share the revised duty roster with you both by Friday, Sunita, and you can mark changes before it goes live."
+ },
+ {
+  "speaker": "Sunita Rao",
+  "startSec": 1058.3,
+  "endSec": 1063.3,
+  "text": "Friday theek hai. Housekeeping ka bhi roster usme hoga?"
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 1071.3,
+  "endSec": 1075.3,
+  "text": "Yes, all departments in one file."
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 1101.3,
+  "endSec": 1116.2,
+  "text": "Next point is compliance. The FSSAI licence renewal is due on 30 November. We need the updated layout drawing and the water test report from your side."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 1134.2,
+  "endSec": 1143.6,
+  "text": "Water test report hamare paas hai, layout drawing architect se lena padega. Sunita, tum architect ko bolo."
+ },
+ {
+  "speaker": "Sunita Rao",
+  "startSec": 1157.6,
+  "endSec": 1165.3,
+  "text": "Haan, main architect se drawing le kar Priya ko bhej dungi, agle hafte tak."
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 1181.3,
+  "endSec": 1195.6,
+  "text": "Thank you. Once we have both, DNY will file the renewal. We will also run an internal FSSAI audit of the kitchen before the inspector comes."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 1203.6,
+  "endSec": 1207.6,
+  "text": "Audit kab karoge?"
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 1219.6,
+  "endSec": 1229.5,
+  "text": "In the third week of November, before the 20th. I will confirm the exact date with the chef."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 1257.5,
+  "endSec": 1271.8,
+  "text": "Theek hai. Ab GST ka point. Humare CA ne bola ki October ke kuch banquet invoices mein GST galat laga hai, 12 ki jagah 18 percent."
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 1287.8,
+  "endSec": 1301.6,
+  "text": "That is a risk we should fix quickly. Can your accounts team share the invoices in question so we can check with the banquet team?"
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 1313.6,
+  "endSec": 1319.1,
+  "text": "Haan, main CA ko bolta hoon, woh list bhej dega."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 1333.1,
+  "endSec": 1344.1,
+  "text": "Thank you. If it is our billing error we will correct the invoices and the return before the filing date."
+ },
+ {
+  "speaker": "Sunita Rao",
+  "startSec": 1368.1,
+  "endSec": 1379.7,
+  "text": "Ek complaint aur hai guests ki taraf se. Breakfast buffet mein South Indian items kam hain, kaafi reviews mein likha hai."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 1395.7,
+  "endSec": 1409.5,
+  "text": "Noted. The chef can add idli, vada and a dosa counter on weekends. Let me check the cost impact first and come back to you."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 1427.5,
+  "endSec": 1436.9,
+  "text": "Cost dekh lo, lekin reviews important hain. TripAdvisor rating 4.1 se 3.9 ho gayi hai is mahine."
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 1458.9,
+  "endSec": 1476.5,
+  "text": "We track that weekly, and it is in the MIS from this month. Moving on, the staff training. The new SOP training for front office was planned for October and got pushed."
+ },
+ {
+  "speaker": "Sunita Rao",
+  "startSec": 1492.5,
+  "endSec": 1503.0,
+  "text": "Haan, kyunki shaadi season tha. November mein kar lete hain, lekin do batches mein, taaki desk khaali na rahe."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 1515.0,
+  "endSec": 1523.2,
+  "text": "Agreed, two batches. We will send the training calendar along with the roster on Friday."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 1543.2,
+  "endSec": 1553.1,
+  "text": "Theek hai. Ek baat aur, December mein humein New Year package launch karna hai, uska plan kab milega?"
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 1567.1,
+  "endSec": 1579.8,
+  "text": "Let us bring the New Year package proposal to the next review. Arjun's team is already working on the F&B side of it."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 1589.8,
+  "endSec": 1593.8,
+  "text": "Okay. Toh next review kab rakhte hain?"
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 1605.8,
+  "endSec": 1619.6,
+  "text": "Same slot, next Wednesday the 11th at 10:30, if that works for everyone. We will come with the direct-booking plan and the New Year proposal."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 1635.6,
+  "endSec": 1647.7,
+  "text": "Agle Budhvar theek hai. Lekin Priya, MIS waali baat ko seriously lo. Agar 5 tareekh tak nahi aaya toh main escalate karunga."
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 1661.7,
+  "endSec": 1674.4,
+  "text": "Understood, Rakesh ji. You will have the October MIS on Thursday and every month on the 5th after that. We take this seriously."
+ },
+ {
+  "speaker": "Sunita Rao",
+  "startSec": 1692.4,
+  "endSec": 1704.0,
+  "text": "Baaki sab theek chal raha hai. New chef ka khana guests ko pasand aa raha hai, woh ek acchi baat hai."
+ },
+ {
+  "speaker": "Rakesh Agarwal",
+  "startSec": 1716.0,
+  "endSec": 1723.7,
+  "text": "Haan, chef accha hai. Chalo, aaj ke liye bas itna. Thank you sab ko."
+ },
+ {
+  "speaker": "Priya Nair",
+  "startSec": 1733.7,
+  "endSec": 1741.4,
+  "text": "Thank you Rakesh ji, thank you Sunita. We will send the minutes today. Bye."
+ },
+ {
+  "speaker": "Arjun Mehta",
+  "startSec": 1747.4,
+  "endSec": 1751.4,
+  "text": "Thanks everyone, bye."
+ }
+]
