@@ -550,13 +550,15 @@ promoting CTAs to tasks.
 
 ## 7. Open questions for Tarique (with the default we assume)
 
+**Decided by Tarique on 5 Nov 2026:** questions 1, 2, 3 and 5, each exactly as its default below. The others still run on their defaults until someone says otherwise.
+
 | # | Question | Default if unanswered |
 | --- | --- | --- |
-| 1 | Who approves and lands changes in dny-erp (migration `0141`, the route, the env var)? The repo's only committer is "DNY Execution Team" (TechDNYsanchay) and its `CLAUDE.md` demands a `DECISIONS.md` entry for schema/security changes. | Tarique prepares the branch; the person who holds the TechDNYsanchay push rights reviews and pushes `main`; we do not push to dny-erp from this repo. |
-| 2 | Transport: the HTTP route (§4.1, recommended) or a direct Postgres role/RPC? | HTTP route with a bearer secret. |
-| 3 | Do client-owed items (`owed_by='client'`) go to the ERP at all? | No. They stay in Call to Action; the sheet shows them under "Client owes". |
+| 1 | Who approves and lands changes in dny-erp (migration `0141`, the route, the env var)? The repo's only committer is "DNY Execution Team" (TechDNYsanchay) and its `CLAUDE.md` demands a `DECISIONS.md` entry for schema/security changes. | **Decided 5 Nov 2026.** Tarique prepares the branch; the person who holds the TechDNYsanchay push rights reviews and pushes `main`; we do not push to dny-erp from this repo. |
+| 2 | Transport: the HTTP route (§4.1, recommended) or a direct Postgres role/RPC? | **Decided 5 Nov 2026.** HTTP route with a bearer secret. |
+| 3 | Do client-owed items (`owed_by='client'`) go to the ERP at all? | **Decided 5 Nov 2026.** No. They stay in Call to Action; the sheet shows them under "Client owes". |
 | 4 | `owed_by='both'` and `'unclear'`? | `both` pushes when the owner resolves to a DNY person; `unclear` never pushes. |
-| 5 | Items without a due date: ask in the dialog, default a date, or skip? | Ask per item in the dialog; blank means skipped. No invented dates. |
+| 5 | Items without a due date: ask in the dialog, default a date, or skip? | **Decided 5 Nov 2026.** Ask per item in the dialog; blank means skipped. No invented dates. |
 | 6 | Should pushed CTAs carry an approver (`report_to_user_id`)? With one, the owner cannot mark done directly and a Founder approver forces a file upload. | No approver (`audience='TEAM'`). The dialog offers an optional approver per push. |
 | 7 | Which ERP project does a meeting's items attach to? A client can have several. | A picker in the Push dialog listing the client's non-archived projects, ACTIVE first; "General CTA (no project)" allowed. |
 | 8 | Who is `created_by` on pushed CTAs: the DNY person who pressed Push, or a dedicated "Call to Action" profile? | The person who pressed Push (resolved by email); a dedicated profile only as fallback. |
