@@ -7,7 +7,7 @@ by a timestamped quote. Sales meetings are labelled and left to the sales agent 
 ## Accounts: DNY only
 
 This is a DNY work project. Vercel: the DNY team (`team_OlIlw1Oi3U81fSrgeQnvcZaq`, the same team as
-dny-call-qa), project `dny-call-to-action`. GitHub: `TechDNYsanchay/dny-call-to-action`; push with `git push dny main` (the `dny` remote uses
+dny-call-qa), project `dny-call-to-action`. GitHub: `TechDNYsanchay/DNY-call-to-action`; push with `git push dny main` (the `dny` remote uses
 the SSH host `github-dny`); the `origin` remote is the plain HTTPS URL kept only so the Vercel CLI can read it.
 The Vercel project is connected to this repo: every push to `main` deploys production, so push only green builds. Supabase: project `dny-call-to-action` (ref `iaxjxefipmdumfukttvv`, Mumbai) in
 tech@dnyhospitality.com's organisation. Never use the personal tariquescript accounts. The machine's global Vercel login is the personal one and
