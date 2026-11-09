@@ -20,6 +20,11 @@ export interface TldvMeeting {
   invitees: TldvPerson[];
   /** The meeting's page in tl;dv, where the recording plays. */
   url: string | null;
+  /**
+   * The Google Meet code ("abc-defg-hij") from extraProperties.conferenceId. A meeting booked in this
+   * app carries the code of its booking; null for other meetings or when tl;dv left it out.
+   */
+  meetCode: string | null;
 }
 
 const text = (value: unknown): string | null => (typeof value === "string" && value.trim() ? value.trim() : null);
@@ -46,7 +51,14 @@ export function parseTldvMeeting(value: unknown): TldvMeeting | null {
     organizer: person(v.organizer),
     invitees: Array.isArray(v.invitees) ? v.invitees.map(person) : [],
     url: url?.startsWith("https://") ? url : null,
+    meetCode: parseMeetCode(((v.extraProperties ?? {}) as Record<string, unknown>).conferenceId),
   };
+}
+
+/** "https://meet.google.com/abc-defg-hij?x" or "ABC-DEFG-HIJ" -> "abc-defg-hij"; null if neither. */
+export function parseMeetCode(value: unknown): string | null {
+  const match = (typeof value === "string" ? value : "").toLowerCase().match(/\b([a-z]{3}-[a-z]{4}-[a-z]{3})\b/);
+  return match ? match[1] : null;
 }
 
 /** Transcript turns from GET .../transcript (`{ data: [...] }`), a bare array, or the older `{ segments: [...] }` shape. */

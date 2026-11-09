@@ -8,7 +8,7 @@ import { supabaseAdmin, type Db } from "@/lib/supabase/server";
 import { tldv, TldvError } from "@/lib/tldv/client";
 import type { TldvMeeting } from "@/lib/tldv/parse";
 import { NO_TRANSCRIPT_REASON, transcriptDecision, type MeetingSource, type ProcessStatus } from "./decisions";
-import { logEvent, markWaiting, storeTranscript, upsertMeeting } from "./intake";
+import { knownMeetingIds, logEvent, markWaiting, storeTranscript, upsertMeeting } from "./intake";
 import { readSettings } from "./settings";
 
 export interface SyncResult {
@@ -111,14 +111,24 @@ export async function tick({ now = new Date(), deadlineMs = 240_000 }: { now?: D
       await logEvent("error", "poll", `Listing tl;dv meetings failed: ${describe(error)}`);
     }
     counts.listed = listed.length;
-    for (const meeting of listed) {
+    // The listing may leave out a meeting's Meet code. A meeting seen for the first time without one
+    // is fetched in full, so a booking made here is recognised before anything is decided about it.
+    let known = new Set<string>();
+    try {
+      known = await knownMeetingIds(listed.filter((m) => !m.meetCode).map((m) => m.id));
+    } catch (error) {
+      counts.errors++;
+      await logEvent("error", "poll", `Reading known meetings failed: ${describe(error)}`);
+    }
+    for (const listedMeeting of listed) {
       if (outOfTime()) break;
       try {
+        const meeting = listedMeeting.meetCode || known.has(listedMeeting.id) ? listedMeeting : ((await client.getMeeting(listedMeeting.id)) ?? listedMeeting);
         const result = await upsertMeeting(meeting, "poll");
         if (result.created) counts.created++;
       } catch (error) {
         counts.errors++;
-        await logEvent("error", "poll", `Upsert of tl;dv meeting ${meeting.id} failed: ${describe(error)}`);
+        await logEvent("error", "poll", `Upsert of tl;dv meeting ${listedMeeting.id} failed: ${describe(error)}`);
       }
     }
 

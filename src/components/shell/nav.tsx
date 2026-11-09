@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { Buildings, GearSix, ListChecks, Tray, UserCircleCheck } from "@phosphor-icons/react";
+import { Buildings, CalendarPlus, GearSix, ListChecks, Tray, UserCircleCheck } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Tooltip, TooltipProvider } from "@/components/ui/primitives";
@@ -14,7 +14,7 @@ import type { NavItem, NavKey } from "./nav-items";
 
 export type { NavItem, NavKey };
 
-const ICONS: Record<NavKey, typeof Tray> = { meetings: Tray, review: UserCircleCheck, mine: ListChecks, clients: Buildings, settings: GearSix };
+const ICONS: Record<NavKey, typeof Tray> = { meetings: Tray, book: CalendarPlus, review: UserCircleCheck, mine: ListChecks, clients: Buildings, settings: GearSix };
 
 const isActive = (pathname: string, href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
@@ -83,13 +83,13 @@ export function IconRailNav({ items }: { items: NavItem[] }) {
   );
 }
 
-/** Phone bottom tab bar: Meetings, Review, Mine, Clients. Settings lives behind the avatar. */
+/** Phone bottom tab bar: Meetings, Book, Review, Mine, Clients. Settings lives behind the avatar. */
 export function TabBar({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
   const tabs = items.filter((i) => i.key !== "settings");
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-hairline bg-canvas/95 pb-safe backdrop-blur md:hidden">
-      <ul className="grid h-14 grid-cols-4">
+      <ul className="grid h-14 grid-cols-5">
         {tabs.map((item) => {
           const Icon = ICONS[item.key];
           const active = isActive(pathname, item.href);

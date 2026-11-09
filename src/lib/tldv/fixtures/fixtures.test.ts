@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { externalsOf, parseTldvMeeting, parseTldvTranscript, parseTldvWebhook } from "../parse";
+import { externalsOf, parseMeetCode, parseTldvMeeting, parseTldvTranscript, parseTldvWebhook } from "../parse";
 import { wordCount } from "../turns";
 import meeting from "./meeting.json";
 import transcript from "./transcript.json";
@@ -45,5 +45,14 @@ describe("fixtures parse like the real tl;dv shapes", () => {
     expect(hook).toMatchObject({ id: "evt_01JBX5N4D8H2K6M1P9R3T7V5X0", event: "TranscriptReady", meetingId: meeting.id });
     expect(hook?.meeting).toBeNull();
     expect(hook?.transcript?.length).toBeGreaterThan(10);
+  });
+});
+
+describe("Meet code", () => {
+  it("is read from extraProperties.conferenceId", () => {
+    expect(parseTldvMeeting(meeting)?.meetCode).toBe("abc-defg-hij");
+    expect(parseTldvMeeting({ ...meeting, extraProperties: undefined })?.meetCode).toBeNull();
+    expect(parseMeetCode("https://meet.google.com/KTU-GJVH-VMF?authuser=0")).toBe("ktu-gjvh-vmf");
+    expect(parseMeetCode("zoom-12345")).toBeNull();
   });
 });

@@ -15,7 +15,7 @@ import {
   transcriptDecision,
   type MeetingState,
 } from "./decisions";
-import type { RulesResult } from "./rules";
+import { applyRules, type RulesResult } from "./rules";
 
 const meeting: TldvMeeting = {
   id: "m1",
@@ -29,6 +29,7 @@ const meeting: TldvMeeting = {
     { name: "Phone guest", email: null },
   ],
   url: null,
+  meetCode: null,
 };
 
 const state = (over: Partial<MeetingState> = {}): MeetingState => ({ type: "unknown", type_source: "rule", process_status: "new", transcript_ready: false, ...over });
@@ -48,6 +49,10 @@ describe("metadata and participants", () => {
       organizer_name: "Priya Nair",
       tldv_url: "https://app.tldv.io/meetings/m1",
     });
+  });
+  it("stores the Meet code only when tl;dv sent one, so a listing without it never erases it", () => {
+    expect(metadataColumns({ ...meeting, meetCode: "abc-defg-hij" })).toMatchObject({ meet_code: "abc-defg-hij" });
+    expect(metadataColumns(meeting)).not.toHaveProperty("meet_code");
   });
   it("builds one participant row per email, marking DNY and the organiser, dropping people without email", () => {
     expect(participantRows(meeting)).toEqual([
@@ -73,6 +78,10 @@ describe("planAfterUpsert", () => {
   });
   it("a new too-short recording is skipped straight away", () => {
     expect(planAfterUpsert(null, shortRule).process_status).toBe("skipped");
+  });
+  it("a meeting named as a vision call is closed here and left to Sales QA", () => {
+    const salesRule = applyRules({ durationSec: 2700, sentenceCount: null, participants: [], clients: [], title: "Vision call: Ravi × DNY Hospitality" });
+    expect(planAfterUpsert(null, salesRule)).toEqual({ typeColumns: expect.objectContaining({ type: "sales", type_source: "rule" }), process_status: "skipped" });
   });
   it("an existing meeting gets its type refreshed but keeps its status", () => {
     expect(planAfterUpsert(state({ process_status: "ready" }), clientRule)).toEqual({ typeColumns: expect.objectContaining({ type: "client" }), process_status: null });

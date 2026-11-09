@@ -2,6 +2,7 @@
 // The rules decide the easy cases; everything else is 'unknown' and the Claude routine reads the
 // transcript. Reasons are written for the card a non-technical reviewer sees.
 
+import { isClientTitle, isSalesTitle } from "@/lib/booking";
 import { DNY_EMAIL_DOMAIN } from "@/lib/env";
 import { formatDuration } from "@/lib/format";
 
@@ -40,7 +41,7 @@ export interface ClientLike {
   contact_emails: string[];
 }
 
-export type RuleType = "client" | "other" | "unknown";
+export type RuleType = "client" | "sales" | "other" | "unknown";
 
 export interface RulesInput {
   durationSec: number;
@@ -48,6 +49,10 @@ export interface RulesInput {
   sentenceCount: number | null;
   participants: ParticipantLike[];
   clients: ClientLike[];
+  /** The meeting's title from tl;dv. */
+  title?: string | null;
+  /** The booking made in this app with the recording's Meet code, if there is one. */
+  booking?: { clientId: string | null } | null;
 }
 
 export interface RulesResult {
@@ -55,11 +60,14 @@ export interface RulesResult {
   source: "rule";
   confidence: number;
   reason: string;
-  /** True when a rule settled it (A or B); false means the routine classifies. */
+  /** True when a rule settled it; false means the routine classifies. */
   decided: boolean;
-  rule: "A" | "B" | null;
+  /** A: no content; booking: booked here; title: named as a sales or client meeting; B: a known client invited. */
+  rule: RuleName | null;
   clientId: string | null;
 }
+
+export type RuleName = "A" | "booking" | "title" | "B";
 
 export interface ClientMatch {
   client: ClientLike;
@@ -125,14 +133,31 @@ export function describeOutsiders(participants: ParticipantLike[]): string {
   return `${list}${tail}, none on the client list.`;
 }
 
+/**
+ * In order: A (no content, closed whatever it is), a booking made here (client, its client), a
+ * "vision call" title (sales, left to Sales QA), a "Client meeting" title (client), B (a known
+ * client's address on the invite). Anything else is 'unknown' for the routine.
+ */
 export function applyRules(input: RulesInput): RulesResult {
-  const { durationSec, sentenceCount, participants, clients } = input;
+  const { durationSec, sentenceCount, participants, clients, title = null, booking = null } = input;
   // Rule A: no content. A duration of 0 means tl;dv did not say, so only a known short duration counts.
   if (durationSec > 0 && durationSec < MIN_DURATION_SEC) {
     return decided("other", "A", `Recording is only ${formatDuration(durationSec)} long; too short to be a real meeting.`);
   }
   if (sentenceCount !== null && sentenceCount < MIN_SENTENCES) {
     return decided("other", "A", `Transcript has only ${plural(sentenceCount, "sentence")}; too short to be a real meeting.`);
+  }
+  // Booked in this app: the recording's Meet code is a booking's, so it is a client meeting.
+  if (booking) {
+    const clientId = booking.clientId ?? matchClient(participants, clients)?.client.id ?? null;
+    return { ...decided("client", "booking", "Booked in Call to Action as a client meeting (the Meet link is the booking's)."), clientId };
+  }
+  // Named the way Sales QA books vision calls: a sales meeting, handled there, not here.
+  if (isSalesTitle(title)) return decided("sales", "title", 'The title says "vision call": a sales meeting, handled by Sales QA.');
+  // Named the way this app books client meetings.
+  if (isClientTitle(title)) {
+    const titled = matchClient(participants, clients);
+    return { ...decided("client", "title", `The title says "Client meeting"${titled ? ` and ${titled.client.name} is on the invite` : ""}.`), clientId: titled?.client.id ?? null };
   }
   // Rule B: someone from a known client was on the invite.
   const match = matchClient(participants, clients);
@@ -146,6 +171,6 @@ export function applyRules(input: RulesInput): RulesResult {
   return { type: "unknown", source: "rule", confidence: UNDECIDED_CONFIDENCE, reason: describeOutsiders(participants), decided: false, rule: null, clientId: null };
 }
 
-function decided(type: RuleType, rule: "A" | "B", reason: string): RulesResult {
+function decided(type: RuleType, rule: RuleName, reason: string): RulesResult {
   return { type, source: "rule", confidence: RULE_CONFIDENCE, reason, decided: true, rule, clientId: null };
 }

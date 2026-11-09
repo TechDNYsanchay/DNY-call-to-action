@@ -53,6 +53,8 @@ export function metadataColumns(meeting: TldvMeeting) {
     organizer_email: meeting.organizer.email,
     organizer_name: meeting.organizer.name,
     tldv_url: meeting.url ?? `https://app.tldv.io/meetings/${meeting.id}`,
+    // Only when tl;dv sent one: a listing without it must not erase the code that ties a booking.
+    ...(meeting.meetCode ? { meet_code: meeting.meetCode } : {}),
   };
 }
 
@@ -83,16 +85,17 @@ export function participantRows(meeting: TldvMeeting): ParticipantRow[] {
 
 /**
  * Plan for a meeting seen without its transcript (webhook MeetingReady, poll, backfill). A new row
- * starts 'new', or 'skipped' straight away when Rule A already says the recording is too short.
- * An existing row only gets its type refreshed (a client may have been added since), never its status,
- * except that a too-short recording still waiting for a transcript is closed as skipped.
+ * starts 'new', or 'skipped' straight away when a rule already says it is not a client meeting (too
+ * short, or a sales meeting named "vision call"). An existing row only gets its type refreshed (a
+ * client may have been added since), never its status, except that such a meeting still waiting for
+ * a transcript is closed as skipped.
  */
 export function planAfterUpsert(existing: MeetingState | null, rules: RulesResult): { typeColumns: TypeColumns | null; process_status: ProcessStatus | null } {
   const typeColumns = typeColumnsFrom(rules);
-  const tooShort = rules.decided && rules.type !== "client";
-  if (!existing) return { typeColumns, process_status: tooShort ? "skipped" : "new" };
+  const notOurs = rules.decided && rules.type !== "client";
+  if (!existing) return { typeColumns, process_status: notOurs ? "skipped" : "new" };
   if (!canChangeType(existing)) return { typeColumns: null, process_status: null };
-  if (tooShort && AWAITING_TRANSCRIPT.has(existing.process_status)) return { typeColumns, process_status: "skipped" };
+  if (notOurs && AWAITING_TRANSCRIPT.has(existing.process_status)) return { typeColumns, process_status: "skipped" };
   return { typeColumns, process_status: null };
 }
 

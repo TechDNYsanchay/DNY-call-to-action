@@ -2,7 +2,7 @@
 // client nav (which needs the pathname) can render it. A "use client" module cannot export a
 // function for the server to call, which is why this does not live in nav.tsx.
 
-export type NavKey = "meetings" | "review" | "mine" | "clients" | "settings";
+export type NavKey = "meetings" | "book" | "review" | "mine" | "clients" | "settings";
 
 export interface NavItem {
   key: NavKey;
@@ -15,6 +15,7 @@ export interface NavItem {
 export function navItems(reviewCount: number, isAdmin: boolean): NavItem[] {
   return [
     { key: "meetings", href: "/meetings", label: "Meetings", short: "Meetings" },
+    { key: "book", href: "/bookings", label: "Book a meeting", short: "Book" },
     { key: "review", href: "/review", label: "Needs review", short: "Review", badge: reviewCount },
     { key: "mine", href: "/mine", label: "My actions", short: "Mine" },
     { key: "clients", href: "/clients", label: "Clients", short: "Clients" },

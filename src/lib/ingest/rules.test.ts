@@ -108,3 +108,38 @@ describe("describeOutsiders", () => {
     expect(describeOutsiders([])).toBe("No participant emails were shared; the client may have joined from a forwarded link or by phone.");
   });
 });
+
+describe("booked and named meetings", () => {
+  const guest = [...dny, { email: "rakesh@hotelsunrise.in", name: "Rakesh" }];
+  const stranger = [...dny, { email: "someone@unknown.co", name: "Someone" }];
+  const base = { durationSec: 45 * 60, sentenceCount: null, clients };
+
+  it("takes a meeting booked here as a client meeting with the booking's client", () => {
+    const r = applyRules({ ...base, participants: stranger, booking: { clientId: "c9" }, title: "Vision call: Ravi × DNY Hospitality" });
+    expect(r).toMatchObject({ type: "client", decided: true, rule: "booking", clientId: "c9", source: "rule" });
+  });
+
+  it("falls back to the invite for a booking whose client was removed", () => {
+    expect(applyRules({ ...base, participants: guest, booking: { clientId: null } })).toMatchObject({ type: "client", rule: "booking", clientId: "c1" });
+  });
+
+  it("still closes a booked meeting with no content (a no-show)", () => {
+    expect(applyRules({ ...base, durationSec: 90, participants: guest, booking: { clientId: "c1" } })).toMatchObject({ type: "other", rule: "A", decided: true });
+  });
+
+  it("leaves vision calls to Sales QA, even with a known client invited", () => {
+    const r = applyRules({ ...base, participants: guest, title: "Vision call: Sunrise × DNY Hospitality" });
+    expect(r).toMatchObject({ type: "sales", decided: true, rule: "title", clientId: null });
+    expect(r.reason).toMatch(/Sales QA/);
+  });
+
+  it("takes a 'Client meeting' title as a client meeting, with the client when one is invited", () => {
+    expect(applyRules({ ...base, participants: guest, title: "Client meeting: Sunrise × DNY Hospitality" })).toMatchObject({ type: "client", rule: "title", clientId: "c1" });
+    expect(applyRules({ ...base, participants: stranger, title: "Client meeting: New Co × DNY Hospitality" })).toMatchObject({ type: "client", rule: "title", clientId: null, decided: true });
+  });
+
+  it("keeps the old rules for everything else", () => {
+    expect(applyRules({ ...base, participants: guest, title: "Weekly sync" })).toMatchObject({ type: "client", rule: "B" });
+    expect(applyRules({ ...base, participants: stranger, title: "Weekly sync" })).toMatchObject({ type: "unknown", decided: false });
+  });
+});

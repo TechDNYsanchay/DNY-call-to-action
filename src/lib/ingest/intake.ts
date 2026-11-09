@@ -24,9 +24,15 @@ import { applyRules, type ClientLike } from "./rules";
 
 export type EventLevel = "info" | "warn" | "error";
 
-const STATE_COLUMNS = "id, type, type_source, process_status, transcript_ready, duration_sec";
+const STATE_COLUMNS = "id, type, type_source, process_status, transcript_ready, duration_sec, title, meet_code";
 
-type StateRow = MeetingState & { id: string; duration_sec: number };
+type StateRow = MeetingState & { id: string; duration_sec: number; title: string | null; meet_code: string | null };
+
+interface BookingRef {
+  id: string;
+  clientId: string | null;
+  meetingId: string | null;
+}
 
 /** One line in pipeline_events. Never pass transcript text. Logging must never break the pipeline. */
 export async function logEvent(level: EventLevel, step: string, message: string, meetingId?: string | null): Promise<void> {
@@ -50,6 +56,29 @@ async function loadState(db: Db, filter: { id?: string; tldvMeetingId?: string }
   return data;
 }
 
+/** The booking made in this app for a Meet code, if any (whatever its status: the code is unique). */
+async function loadBooking(db: Db, meetCode: string | null): Promise<BookingRef | null> {
+  if (!meetCode) return null;
+  const { data, error } = await db.from("client_meeting_bookings").select("id, client_id, meeting_id").eq("meet_code", meetCode).maybeSingle();
+  if (error) throw new Error(`bookings read failed: ${error.message}`);
+  return data ? { id: data.id, clientId: data.client_id, meetingId: data.meeting_id } : null;
+}
+
+/** Ties a booking to its recording, so the bookings list can show what became of it. */
+async function linkBooking(db: Db, booking: BookingRef | null, meetingId: string): Promise<void> {
+  if (!booking || booking.meetingId === meetingId) return;
+  const { error } = await db.from("client_meeting_bookings").update({ meeting_id: meetingId }).eq("id", booking.id);
+  if (error) throw new Error(`bookings update failed: ${error.message}`);
+}
+
+/** Which of these tl;dv meeting ids are already stored. */
+export async function knownMeetingIds(tldvMeetingIds: string[]): Promise<Set<string>> {
+  if (!tldvMeetingIds.length) return new Set();
+  const { data, error } = await supabaseAdmin().from("meetings").select("tldv_meeting_id").in("tldv_meeting_id", tldvMeetingIds);
+  if (error) throw new Error(`meetings read failed: ${error.message}`);
+  return new Set((data ?? []).map((m) => m.tldv_meeting_id));
+}
+
 export interface UpsertResult {
   meetingId: string;
   created: boolean;
@@ -66,8 +95,8 @@ export async function upsertMeeting(meeting: TldvMeeting & { raw?: unknown }, so
   const db = supabaseAdmin();
   const existing = await loadState(db, { tldvMeetingId: meeting.id });
   const participants = participantRows(meeting);
-  const clients = await loadClients(db);
-  const rules = applyRules({ durationSec: meeting.durationSec, sentenceCount: null, participants, clients });
+  const [clients, booking] = await Promise.all([loadClients(db), loadBooking(db, meeting.meetCode ?? existing?.meet_code ?? null)]);
+  const rules = applyRules({ durationSec: meeting.durationSec, sentenceCount: null, participants, clients, title: meeting.title, booking });
   const plan = planAfterUpsert(existing, rules);
   const metadata = metadataColumns(meeting);
   const raw = (meeting.raw ?? { ...meeting, raw: undefined }) as Json;
@@ -107,8 +136,10 @@ export async function upsertMeeting(meeting: TldvMeeting & { raw?: unknown }, so
     if (insError) throw new Error(`participants insert failed: ${insError.message}`);
   }
 
+  await linkBooking(db, booking, meetingId);
+
   if (created) {
-    const what = status === "skipped" ? `skipped at intake (${rules.reason})` : rules.decided ? `rule says ${rules.type}` : "type to be decided";
+    const what = status === "skipped" ? `skipped at intake (${rules.reason})` : booking ? "booked here as a client meeting" : rules.decided ? `rule says ${rules.type}` : "type to be decided";
     await logEvent("info", "intake", `Meeting seen via ${source}: ${what}`, meetingId);
   }
   return { meetingId, created, status, transcriptReady: existing?.transcript_ready ?? false };
@@ -131,7 +162,11 @@ export async function storeTranscript(meetingId: string, turns: SpeakerTurn[], t
   const db = supabaseAdmin();
   const state = await loadState(db, { id: meetingId });
   if (!state) throw new Error(`meeting ${meetingId} not found`);
-  const [{ data: participants, error: pError }, clients] = await Promise.all([db.from("participants").select("email, name").eq("meeting_id", meetingId), loadClients(db)]);
+  const [{ data: participants, error: pError }, clients, booking] = await Promise.all([
+    db.from("participants").select("email, name").eq("meeting_id", meetingId),
+    loadClients(db),
+    loadBooking(db, state.meet_code),
+  ]);
   if (pError) throw new Error(`participants read failed: ${pError.message}`);
 
   const sentences = sentenceCount ?? countSentences(turns);
@@ -154,8 +189,9 @@ export async function storeTranscript(meetingId: string, turns: SpeakerTurn[], t
   );
   if (tError) throw new Error(`transcripts upsert failed: ${tError.message}`);
 
-  const rules = applyRules({ durationSec: state.duration_sec, sentenceCount: sentences, participants: participants ?? [], clients });
+  const rules = applyRules({ durationSec: state.duration_sec, sentenceCount: sentences, participants: participants ?? [], clients, title: state.title, booking });
   const plan = planAfterTranscript(state, rules);
+  await linkBooking(db, booking, meetingId);
   const { data: updated, error: mError } = await db
     .from("meetings")
     .update({
