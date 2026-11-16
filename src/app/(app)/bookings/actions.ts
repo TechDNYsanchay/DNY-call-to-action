@@ -17,6 +17,8 @@ export interface Booked {
   meetUrl: string;
   message: string;
   whatsapp: string;
+  /** Null when tl;dv's recorder joins by itself; otherwise why someone in the call must admit it. */
+  recorderMustBeAdmitted: string | null;
 }
 
 export type BookResult = { ok: true; booked: Booked } | { ok: false; errors: FieldErrors };
@@ -70,6 +72,8 @@ export async function bookClientMeeting(input: BookingForm): Promise<BookResult>
     return formError(error instanceof GoogleNotReady ? reason : `Couldn't create the meeting: ${reason}`);
   }
 
+  if (meeting.recorderMustBeAdmitted) console.warn(`Booking ${booking.id}: Meet not opened, the recorder will ask to join (${meeting.recorderMustBeAdmitted})`);
+
   const { error: saveError } = await db.from("client_meeting_bookings").update({ calendar_event_id: meeting.eventId, meet_url: meeting.meetUrl, meet_code: meeting.meetCode }).eq("id", booking.id);
   if (saveError) return formError(`The invites went out, but the booking couldn't be saved: ${saveError.message}`);
 
@@ -82,7 +86,7 @@ export async function bookClientMeeting(input: BookingForm): Promise<BookResult>
   revalidatePath("/bookings");
   revalidatePath("/clients");
   const message = meetingLinkMessage(b.startsAt, meeting.meetUrl);
-  return { ok: true, booked: { clientName, when: whenText(b.startsAt), meetUrl: meeting.meetUrl, message, whatsapp: whatsappShareLink(message) } };
+  return { ok: true, booked: { clientName, when: whenText(b.startsAt), meetUrl: meeting.meetUrl, message, whatsapp: whatsappShareLink(message), recorderMustBeAdmitted: meeting.recorderMustBeAdmitted } };
 }
 
 /** Cancels a meeting still to come: the invite is withdrawn (guests are emailed) and the booking kept as cancelled. */

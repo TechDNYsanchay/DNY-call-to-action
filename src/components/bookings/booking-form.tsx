@@ -174,6 +174,13 @@ function BookedPanel({ booked }: { booked: Booked }) {
           <p className="mt-0.5 text-[14px] text-ink-2">{booked.when} IST. Invites are on their way by email.</p>
         </div>
       </div>
+      {booked.recorderMustBeAdmitted ? (
+        <p role="status" className="border-b border-hairline bg-sienna-tint px-5 py-3 text-[13px] leading-[19px] text-ink-2 sm:px-6">
+          <span className="font-medium text-ink">tl;dv&apos;s recorder will ask to join this one:</span> whoever is in the call clicks <span className="font-medium text-ink">Admit</span> when it knocks, or the meeting isn&apos;t recorded. ({booked.recorderMustBeAdmitted}.)
+        </p>
+      ) : (
+        <p className="border-b border-hairline px-5 py-3 text-[13px] leading-[19px] text-ink-3 sm:px-6">tl;dv&apos;s recorder joins on its own; nobody needs to admit it.</p>
+      )}
       <div className="flex flex-col gap-4 p-5 sm:p-6">
         <div>
           <p className="label-xs">Google Meet link</p>

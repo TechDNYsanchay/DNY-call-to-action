@@ -88,6 +88,20 @@ export default async function BookingsPage({ searchParams }: { searchParams: Sea
           Meetings are created on {recordingAccount()}&apos;s calendar so tl;dv&apos;s bot joins and records them. On Google&apos;s page, sign in as {recordingAccount()}.
         </InlineNote>
       )}
+      {isAdmin && connected && !connected.canOpenMeetings && (
+        <InlineNote
+          tone="sienna"
+          title="Reconnect Google Calendar once so tl;dv's recorder joins on its own"
+          className="mb-4"
+          actions={
+            <a href="/api/google/connect" className={buttonClass("primary")}>
+              Reconnect Google Calendar
+            </a>
+          }
+        >
+          The app can now open each booked meeting to anyone with the link, so nobody has to admit the recorder. That needs one more Google permission: sign in as {recordingAccount()} again and allow it.
+        </InlineNote>
+      )}
       {!isAdmin && !ready && (
         <InlineNote title="Booking isn't open yet" className="mb-4">
           An admin connects the recording calendar first; then you can book client meetings here.

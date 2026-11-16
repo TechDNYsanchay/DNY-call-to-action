@@ -385,6 +385,7 @@ export type Database = {
           email: string
           id: boolean
           refresh_token: string
+          scopes: string[]
         }
         Insert: {
           connected_at?: string
@@ -392,6 +393,7 @@ export type Database = {
           email: string
           id?: boolean
           refresh_token: string
+          scopes?: string[]
         }
         Update: {
           connected_at?: string
@@ -399,6 +401,7 @@ export type Database = {
           email?: string
           id?: boolean
           refresh_token?: string
+          scopes?: string[]
         }
         Relationships: [
           {
