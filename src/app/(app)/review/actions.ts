@@ -1,8 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { requireUser } from "@/lib/auth/require-user";
 import { domainOf, isGenericDomain } from "@/lib/ingest/rules";
+import { startRoutine } from "@/lib/routine";
 import { logPipelineEvent } from "@/lib/sheet/settings";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { type ActionResult, failed, ok } from "@/lib/ui/action-result";
@@ -71,6 +73,7 @@ export async function decideMeetingType(meetingId: string, type: DecisionType, o
     const { error: fError } = await db.from("classification_feedback").insert({ meeting_id: meetingId, from_type: meeting.type, to_type: type, client_id: type === "client" ? clientId : null, note, person_id: person.id });
     if (fError) console.warn(`classification_feedback: ${fError.message}`);
     await logPipelineEvent(meetingId, "info", "decision", `${person.full_name} marked the meeting as ${type}; status ${status}`);
+    if (status === "ready") after(() => startRoutine(`${person.full_name} marked a meeting as a client meeting`));
 
     revalidatePath("/meetings");
     revalidatePath("/review");

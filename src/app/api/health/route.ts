@@ -15,14 +15,15 @@ export async function GET() {
   try {
     const db = supabaseAdmin();
     const dayAgo = new Date(now.getTime() - 86_400_000).toISOString();
-    const [sync, webhook, failed, oldestReady, ...perStatus] = await Promise.all([
+    const [sync, routine, webhook, failed, oldestReady, ...perStatus] = await Promise.all([
       db.from("sync_state").select("last_synced_at").eq("key", "tldv").maybeSingle(),
+      db.from("sync_state").select("last_synced_at").eq("key", "routine-fire").maybeSingle(),
       db.from("webhook_events").select("received_at").order("received_at", { ascending: false }).limit(1).maybeSingle(),
       db.from("meetings").select("id", { count: "exact", head: true }).eq("process_status", "failed").gte("updated_at", dayAgo),
       db.from("meetings").select("updated_at").eq("process_status", "ready").order("updated_at", { ascending: true }).limit(1).maybeSingle(),
       ...STATUSES.map((status) => db.from("meetings").select("id", { count: "exact", head: true }).eq("process_status", status)),
     ]);
-    const failure = [sync, webhook, failed, oldestReady, ...perStatus].find((r) => r.error)?.error;
+    const failure = [sync, routine, webhook, failed, oldestReady, ...perStatus].find((r) => r.error)?.error;
     if (failure) throw new Error(failure.message);
 
     const countsByStatus = Object.fromEntries(STATUSES.map((status, i) => [status, perStatus[i].count ?? 0])) as Record<ProcessStatus, number>;
@@ -33,6 +34,9 @@ export async function GET() {
         now: now.toISOString(),
         lastSyncAt: sync.data?.last_synced_at ?? null,
         lastWebhookAt: webhook.data?.received_at ?? null,
+        // Whether a ready meeting starts the routine at once (only whether the keys are set, never their values).
+        routineStartsAtOnce: Boolean(process.env.ROUTINE_FIRE_URL && process.env.ROUTINE_FIRE_TOKEN),
+        lastRoutineStartAt: routine.data?.last_synced_at ?? null,
         countsByStatus,
         failed24h: failed.count ?? 0,
         oldestReadyAgeMin: readySince ? Math.max(0, Math.round((now.getTime() - readySince) / 60_000)) : null,

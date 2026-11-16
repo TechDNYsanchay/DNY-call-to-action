@@ -10,6 +10,7 @@ import type { TldvMeeting } from "@/lib/tldv/parse";
 import { NO_TRANSCRIPT_REASON, transcriptDecision, type MeetingSource, type ProcessStatus } from "./decisions";
 import { knownMeetingIds, logEvent, markWaiting, storeTranscript, upsertMeeting } from "./intake";
 import { readSettings } from "./settings";
+import { startRoutine } from "@/lib/routine";
 
 export interface SyncResult {
   /** Null when tl;dv does not know the meeting. */
@@ -34,6 +35,8 @@ export async function syncMeeting(tldvMeetingId: string, source: MeetingSource):
   const transcript = await client.getTranscript(tldvMeetingId);
   if (transcript) {
     const stored = await storeTranscript(meetingId, transcript.turns, transcript.transcriptId, transcript.sentenceCount);
+    // Ready for a sheet: start the routine now rather than at the next hourly run.
+    if (stored.status === "ready") await startRoutine(`transcript stored for a meeting (${source})`);
     return { meetingId, status: stored.status, created, transcriptStored: true, waiting: false };
   }
   const waitingStatus = await markWaiting(meetingId);
@@ -133,6 +136,7 @@ export async function tick({ now = new Date(), deadlineMs = 240_000 }: { now?: D
     }
 
     // 2. Transcripts still missing, oldest first, at most one attempt each per tick.
+    let readyNow = 0;
     const graceCutoff = new Date(now.getTime() - 10 * 60_000).toISOString();
     const { data: pending, error: pendingError } = await db
       .from("meetings")
@@ -162,8 +166,9 @@ export async function tick({ now = new Date(), deadlineMs = 240_000 }: { now?: D
       try {
         const transcript = await client.getTranscript(m.tldv_meeting_id);
         if (transcript) {
-          await storeTranscript(m.id, transcript.turns, transcript.transcriptId, transcript.sentenceCount);
+          const stored = await storeTranscript(m.id, transcript.turns, transcript.transcriptId, transcript.sentenceCount);
           counts.transcriptsStored++;
+          if (stored.status === "ready") readyNow++;
         } else {
           await markWaiting(m.id);
           counts.waiting++;
@@ -187,6 +192,9 @@ export async function tick({ now = new Date(), deadlineMs = 240_000 }: { now?: D
     } else {
       counts.released = released ?? 0;
     }
+
+    // Meetings that just became ready (or went back to ready) get the routine started once, now.
+    if (readyNow + counts.released > 0) await startRoutine(`${readyNow + counts.released} meeting(s) ready after the 10-minute check`);
 
     if (listOk) {
       const { error } = await db.from("sync_state").update({ last_synced_at: now.toISOString() }).eq("key", LOCK_KEY);

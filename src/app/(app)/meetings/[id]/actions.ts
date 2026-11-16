@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { requireAdmin, requireUser } from "@/lib/auth/require-user";
+import { startRoutine } from "@/lib/routine";
 import { logPipelineEvent } from "@/lib/sheet/settings";
 import type { Database } from "@/lib/supabase/database.types";
 import { supabaseAdmin } from "@/lib/supabase/server";
@@ -157,6 +159,7 @@ export async function rerunMeeting(meetingId: string): Promise<ActionResult> {
     const { error: uError } = await db.from("meetings").update({ process_status: "ready", claimed_at: null, failure_reason: null }).eq("id", meetingId);
     if (uError) throw new Error(uError.message);
     await logPipelineEvent(meetingId, "info", "rerun", `${person.full_name} queued the meeting for another run`);
+    after(() => startRoutine(`${person.full_name} asked for a meeting to be run again`));
     revalidatePath(`/meetings/${meetingId}`);
     revalidatePath("/meetings");
     return ok();
