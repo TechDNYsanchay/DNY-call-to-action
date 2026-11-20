@@ -1,5 +1,30 @@
 # ERP integration contract (phase 2)
 
+## As built, 20 Nov 2026: Sync books and pulls
+
+What was built differs from the push design below, which is kept as the record of how it was
+reasoned. **Sync calls this app; this app calls nothing.** DNY asked for a Client meetings tab on each
+Sync project that books the meeting here and brings back the actions DNY owes, to be approved in Sync
+by whoever scheduled the meeting before they become tasks.
+
+Four routes under `/api/erp/`, each refusing without `Authorization: Bearer $ERP_INTEGRATION_SECRET`
+(503 when the variable is unset, 401 when it does not match; `src/lib/erp/guard.ts`), each answering
+with `x-erp-contract: 1` and `cache-control: no-store`. They are public paths in `proxy.ts` because
+they check their own secret.
+
+| Route | Does |
+| --- | --- |
+| `GET /api/erp/people` | The active team list: who can be invited from DNY, `{email, full_name}`. |
+| `POST /api/erp/bookings` | Books a client meeting exactly as the Bookings screen does (`src/lib/booking-store.ts`): Google event with Meet, the tl;dv recorder, the client recorded. `booked_by_email` and every attendee must be active people here (422 otherwise). Answers the booking's id, start and Meet link. |
+| `DELETE /api/erp/bookings/{id}` | Cancels it and the Google event, as the screen does. 404 if there is no such booking. |
+| `GET /api/erp/action-items?booking_ids=a,b` | Up to 100 bookings: each one's recording state and, once its sheet is ready, the items owed by DNY (or both) that are not superseded, each with its stable id, owner, due date, priority and the evidence quoted. |
+
+The same value is set as `ERP_INTEGRATION_SECRET` here and `CALL_TO_ACTION_SECRET` in Sync's Vercel
+project. Sync stores each item once by its id, so asking twice changes nothing. The sections below
+describe the earlier push plan and are not what runs.
+
+---
+
 How Call to Action pushes the action items of a client meeting into DNY's ERP ("Sync",
 GitHub `TechDNYsanchay/dny-erp`), and how their status comes back.
 

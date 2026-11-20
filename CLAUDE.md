@@ -58,6 +58,7 @@ The routine never holds database keys.
 | `src/lib/ingest/` | Webhook and cron intake, transcript fetch, rule-based classification |
 | `src/lib/sheet/` | The sheet result schema, transcript formatting, validation and saving |
 | `src/app/api/agent/` | The routine's work API |
+| `src/app/api/erp/` | Sync's API: book and cancel client meetings, read their DNY-owed items (`ERP_INTEGRATION_SECRET`; `docs/erp-integration.md`) |
 | `src/app/(app)/` | Signed-in screens |
 | `agent/` | The guide the routine reads and the routine prompt |
 | `PLAN.md` | The plan this was built from |

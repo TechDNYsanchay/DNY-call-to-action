@@ -10,6 +10,7 @@ export function isPublicPath(pathname: string): boolean {
     pathname.startsWith("/api/webhooks/") ||
     pathname.startsWith("/api/cron/") ||
     pathname.startsWith("/api/agent/") ||
+    pathname.startsWith("/api/erp/") ||
     pathname === "/api/health"
   );
 }
