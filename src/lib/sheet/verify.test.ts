@@ -180,6 +180,16 @@ describe("checkSheet", () => {
     expect(checkSheet(sheet({ action_items: [action({ linked_decision_id: "D9" })] }), ctx).errors[0]).toContain("not a decision id");
   });
 
+  it("takes one to three summary bullets for a call, still exactly three for a meeting", () => {
+    const call: CheckContext = { ...ctx, kind: "call" };
+    expect(checkSheet(sheet({ executive_summary: ["One."] }), call).errors).toEqual([]);
+    expect(checkSheet(sheet({ executive_summary: ["One.", "Two.", "Three."] }), call).errors).toEqual([]);
+    expect(checkSheet(sheet({ executive_summary: ["One.", "Two.", "Three.", "Four."] }), call).errors[0]).toContain("one to three bullets are required for a call, got 4");
+    expect(checkSheet(sheet({ executive_summary: [] }), call).errors[0]).toContain("got 0");
+    expect(checkSheet(sheet({ executive_summary: ["One.", "Two."] }), { ...ctx, kind: "meeting" }).errors[0]).toBe("executive_summary: exactly 3 bullets are required, got 2");
+    expect(checkSheet(sheet({ executive_summary: ["One.", "Two."] }), ctx).errors[0]).toBe("executive_summary: exactly 3 bullets are required, got 2");
+  });
+
   it("checks the next meeting", () => {
     const nm = { mentioned: false, date: "2026-11-11", raw_phrase: null, purpose: null, evidence: [], confidence: 0.9 };
     const r = checkSheet(sheet({ next_meeting: nm }), ctx);

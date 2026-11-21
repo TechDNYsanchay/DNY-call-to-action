@@ -1,10 +1,10 @@
-import { ArrowLeft, PencilSimple } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft, PencilSimple, PhoneCall } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/require-user";
-import { getClientPage } from "@/lib/data/clients";
-import { formatDateTimeIst, timeAgo } from "@/lib/format";
+import { type ClientPageData, getClientPage } from "@/lib/data/clients";
+import { formatDateTimeIst, formatTimestamp, timeAgo } from "@/lib/format";
 import { statusTone, statusWord } from "@/lib/ui/status";
 import { ClientDialog } from "@/components/clients/client-dialog";
 import { ItemLine } from "@/components/meeting/item-line";
@@ -15,6 +15,13 @@ import { QuietLine } from "@/components/ui/states";
 
 type Params = Promise<{ id: string }>;
 
+/** An open item links to the meeting it came from, or to its call at the second the quote is said. */
+function itemContext(i: ClientPageData["items"][number]): { href: string; label: string } {
+  const label = i.meeting_title ?? formatDateTimeIst(i.meeting_happened_at);
+  if (i.meeting_kind === "call") return { href: `/calls/${i.meeting_id}${i.evidence_ts_sec != null ? `?t=${i.evidence_ts_sec}` : ""}`, label };
+  return { href: `/meetings/${i.meeting_id}`, label };
+}
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { id } = await params;
   await requireUser();
@@ -22,13 +29,14 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return { title: data?.client.name ?? "Client" };
 }
 
-// One client's history: open items across meetings in two lanes, then the meetings with their minutes.
+// One client's history: open items across meetings and calls in two lanes, then the meetings with their
+// minutes, then the phone calls.
 export default async function ClientPage({ params }: { params: Params }) {
   const { id } = await params;
   const { isAdmin } = await requireUser();
   const data = await getClientPage(id);
   if (!data) notFound();
-  const { client, meetings, items } = data;
+  const { client, meetings, calls, items } = data;
   const now = new Date();
   const dny = items.filter((i) => i.owed_by === "dny" || i.owed_by === "both");
   const theirs = items.filter((i) => i.owed_by === "client" || i.owed_by === "both");
@@ -48,6 +56,7 @@ export default async function ClientPage({ params }: { params: Params }) {
             {client.contact_emails.length > 0 && <span className="font-mono text-[12px]">· {client.contact_emails.join(", ")}</span>}
             <span>
               · {meetings.length} meeting{meetings.length === 1 ? "" : "s"}
+              {calls.length > 0 && ` · ${calls.length} call${calls.length === 1 ? "" : "s"}`}
             </span>
           </p>
           {client.notes && <p className="mt-2 max-w-[70ch] text-[14px] leading-[20px] text-ink-2">{client.notes}</p>}
@@ -67,10 +76,10 @@ export default async function ClientPage({ params }: { params: Params }) {
 
       <div className="flex flex-col gap-4">
         <ListGroup title="DNY owes" count={dny.length}>
-          {dny.length ? dny.map((i) => <ItemLine key={i.id} item={i} now={now} context={{ href: `/meetings/${i.meeting_id}`, label: i.meeting_title ?? formatDateTimeIst(i.meeting_happened_at) }} />) : <QuietLine className="px-4">Nothing open for DNY.</QuietLine>}
+          {dny.length ? dny.map((i) => <ItemLine key={i.id} item={i} now={now} context={itemContext(i)} />) : <QuietLine className="px-4">Nothing open for DNY.</QuietLine>}
         </ListGroup>
         <ListGroup title="Client owes" count={theirs.length}>
-          {theirs.length ? theirs.map((i) => <ItemLine key={`c-${i.id}`} item={i} now={now} context={{ href: `/meetings/${i.meeting_id}`, label: i.meeting_title ?? formatDateTimeIst(i.meeting_happened_at) }} />) : <QuietLine className="px-4">Nothing owed by the client.</QuietLine>}
+          {theirs.length ? theirs.map((i) => <ItemLine key={`c-${i.id}`} item={i} now={now} context={itemContext(i)} />) : <QuietLine className="px-4">Nothing owed by the client.</QuietLine>}
         </ListGroup>
 
         <ListGroup title="Meetings" count={meetings.length}>
@@ -90,6 +99,26 @@ export default async function ClientPage({ params }: { params: Params }) {
             </li>
           ))}
         </ListGroup>
+
+        {calls.length > 0 && (
+          <ListGroup title="Calls" count={calls.length}>
+            {calls.map((c) => (
+              <li key={c.id}>
+                <Link href={`/calls/${c.id}`} className="flex min-h-14 items-center gap-3 px-4 py-2 transition-colors duration-150 hover:bg-raised lg:min-h-12">
+                  <StatusDot tone={statusTone(c.process_status)} />
+                  <PhoneCall size={16} aria-hidden="true" className="shrink-0 text-ink-3" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] font-medium text-ink">{c.headline ?? c.title ?? "Phone call"}</p>
+                    <p className="truncate text-[12px] text-ink-3">
+                      {c.headline ? c.title : statusWord(c.process_status)} · {formatDateTimeIst(c.happened_at)} · <span className="font-mono tnum">{formatTimestamp(c.duration_sec)}</span>
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-[12px] text-ink-3 tnum">{timeAgo(c.happened_at, now)}</span>
+                </Link>
+              </li>
+            ))}
+          </ListGroup>
+        )}
       </div>
     </div>
   );

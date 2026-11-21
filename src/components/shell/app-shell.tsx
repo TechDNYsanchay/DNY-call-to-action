@@ -7,16 +7,19 @@ import { Avatar } from "@/components/ui/chip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToastProvider } from "@/components/ui/toast";
 import { IconRailNav, RailNav, TabBar } from "./nav";
-import { navItems } from "./nav-items";
+import { type CallsNav, navItems } from "./nav-items";
 import { ThemeToggle } from "./theme-toggle";
 import { Wordmark } from "./wordmark";
 
 // The signed-in shell. Desktop (1280+): 240 px rail. Tablet (768 to 1279): 64 px icon rail.
 // Phone: 56 px top bar + bottom tab bar. The content column is sized by each page (880 px for
 // the sheet). Server component; only the nav (active state), toggle and toasts run on the client.
+// A call page's mini-player docks above the tab bar on phones (along the bottom from 768 px) while the
+// player card is out of view, and writes its height to --dock-h, so the content's bottom padding grows
+// with it (0 everywhere else).
 
-export function AppShell({ person, isAdmin, reviewCount, children }: { person: Pick<Person, "full_name" | "email">; isAdmin: boolean; reviewCount: number; children: ReactNode }) {
-  const items = navItems(reviewCount, isAdmin);
+export function AppShell({ person, isAdmin, reviewCount, calls, children }: { person: Pick<Person, "full_name" | "email">; isAdmin: boolean; reviewCount: number; calls?: CallsNav; children: ReactNode }) {
+  const items = navItems(reviewCount, isAdmin, calls);
   return (
     <ToastProvider>
       <div className="min-h-dvh md:flex">
@@ -68,7 +71,7 @@ export function AppShell({ person, isAdmin, reviewCount, children }: { person: P
             </div>
           </header>
 
-          <main id="content" className="px-4 pt-4 pb-[calc(80px+env(safe-area-inset-bottom,0px))] md:px-6 md:pt-6 md:pb-12 lg:px-8">
+          <main id="content" className="px-4 pt-4 pb-[calc(80px+var(--dock-h,0px)+env(safe-area-inset-bottom,0px))] md:px-6 md:pt-6 md:pb-[calc(3rem+var(--dock-h,0px))] lg:px-8">
             {children}
           </main>
         </div>

@@ -5,6 +5,7 @@ import {
   canChangeType,
   countSentences,
   endedAt,
+  isEligibleType,
   metadataColumns,
   nameMatches,
   participantRows,
@@ -119,6 +120,20 @@ describe("planAfterTranscript", () => {
     for (const s of ["processing", "done", "needs_decision", "failed"] as const) {
       expect(planAfterTranscript(state({ process_status: s }), clientRule)).toEqual({ typeColumns: null, process_status: null });
     }
+  });
+});
+
+describe("isEligibleType", () => {
+  it("gives client meetings and client or vendor calls a sheet", () => {
+    expect(isEligibleType("meeting", "client")).toBe(true);
+    expect(isEligibleType("meeting", "vendor")).toBe(false);
+    expect(isEligibleType("call", "vendor")).toBe(true);
+    expect(isEligibleType("call", "client")).toBe(true);
+    expect(isEligibleType("call", "other")).toBe(false);
+    expect(isEligibleType("call", "unknown")).toBe(false);
+  });
+  it("a meeting a person labelled vendor is skipped, as any non-client meeting", () => {
+    expect(planAfterTranscript(state({ type_source: "human", type: "vendor" }), clientRule)).toEqual({ typeColumns: null, process_status: "skipped" });
   });
 });
 

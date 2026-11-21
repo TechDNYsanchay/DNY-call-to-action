@@ -1,13 +1,14 @@
 import clsx from "clsx";
 import { Check, X } from "@phosphor-icons/react/dist/ssr";
-import { type TimelineInput, timelineSteps } from "@/lib/ui/status";
+import { type StepState, type TimelineInput, timelineSteps } from "@/lib/ui/status";
 
 // The five steps a meeting goes through before its sheet exists. An ordered list inside
 // aria-live="polite", so a step change is announced once. The active dot pulses (static under
-// reduced motion); the failed step shows the plain reason.
+// reduced motion); the failed step shows the plain reason. A phone call passes its own `steps`
+// (src/lib/ui/call-status.ts callTimeline); meetings pass none.
 
-export function ProcessingTimeline({ meeting, className }: { meeting: TimelineInput; className?: string }) {
-  const steps = timelineSteps(meeting);
+export function ProcessingTimeline({ meeting, steps: given, className }: { meeting: TimelineInput; steps?: Array<{ key: string; label: string; state: StepState; hint?: string }>; className?: string }) {
+  const steps = given ?? timelineSteps(meeting);
   return (
     <div aria-live="polite" className={className}>
       <ol className="flex flex-col">

@@ -1,6 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
+import { cache } from "react";
 import type { Database } from "@/lib/supabase/database.types";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
 
@@ -8,9 +9,11 @@ export type Person = Database["public"]["Tables"]["people"]["Row"];
 
 /**
  * The signed-in person on the team list, or null. Signed in but not on the list also gives null:
- * Google only proves who someone is; an active row in `people` is what grants access.
+ * Google only proves who someone is; an active row in `people` is what grants access. Read once per
+ * render (React cache), so the layout, the page and its metadata share one read; actions and route
+ * handlers are not a render pass and read it each time.
  */
-export async function currentPerson(): Promise<Person | null> {
+export const currentPerson = cache(async (): Promise<Person | null> => {
   // The session is request-time data. Saying so here (not just reading the cookie) keeps the auth
   // client's clock check out of the prerender pass; route handlers and actions are unaffected.
   await connection();
@@ -33,7 +36,7 @@ export async function currentPerson(): Promise<Person | null> {
     .select("*")
     .maybeSingle();
   return linked ?? null;
-}
+});
 
 /** Whether anyone is signed in at all (team member or not). */
 export async function isSignedIn(): Promise<boolean> {

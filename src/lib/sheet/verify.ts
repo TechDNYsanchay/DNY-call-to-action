@@ -8,6 +8,8 @@ import type { Evidence, Sheet } from "./schema";
 import { hasNumber, normaliseText, tokenOverlap, tokenSetRatio, tokensOf } from "./text";
 
 export interface CheckContext {
+  /** A call's sheet takes one to three summary bullets; a meeting's exactly three. Default meeting. */
+  kind?: "meeting" | "call";
   turns: SpeakerTurn[];
   durationSec: number;
   /** The meeting's calendar date in IST, YYYY-MM-DD. */
@@ -135,7 +137,10 @@ export function checkSheet(sheet: Sheet, ctx: CheckContext): CheckResult {
     adjustedConfidence[id] = Math.round((penalised ? confidence * UNVERIFIED_PENALTY : confidence) * 100) / 100;
   };
 
-  if (sheet.executive_summary.length !== 3) errors.push(`executive_summary: exactly 3 bullets are required, got ${sheet.executive_summary.length}`);
+  const bullets = sheet.executive_summary.length;
+  if (ctx.kind === "call") {
+    if (bullets < 1 || bullets > 3) errors.push(`executive_summary: one to three bullets are required for a call, got ${bullets}`);
+  } else if (bullets !== 3) errors.push(`executive_summary: exactly 3 bullets are required, got ${bullets}`);
 
   const titles = new Map<string, string>();
   sheet.action_items.forEach((item, i) => {

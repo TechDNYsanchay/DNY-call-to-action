@@ -358,3 +358,25 @@
     background-size: 100% 1px;
   }
 }
+
+/* Call pages. The player card sticks to the top only where there is room for it (768 px wide and 640 px
+   tall); it publishes its height as --player-h, so links into the sheet and the transcript land below it.
+   Without it (phones, short windows) targets keep the 5rem of scroll-mt-20, clear of the phone's top bar,
+   and a transcript line followed downwards stops above the tab bar and the mini-player (--dock-h).
+   Unlayered, so this outranks the scroll-mt-20 utility of sections and lanes on call pages only. */
+@media (min-width: 768px) and (min-height: 640px) {
+  .player-sticky {
+    position: sticky;
+    top: 1rem;
+    z-index: 20;
+  }
+}
+.call-page :is(section[id], li[data-start]) {
+  scroll-margin-top: max(5rem, calc(var(--player-h, 0px) + 1.75rem));
+  scroll-margin-bottom: calc(5rem + var(--dock-h, 0px) + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 768px) {
+  .call-page :is(section[id], li[data-start]) {
+    scroll-margin-bottom: calc(1rem + var(--dock-h, 0px));
+  }
+}

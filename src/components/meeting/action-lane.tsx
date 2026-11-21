@@ -1,14 +1,14 @@
 "use client";
 
 import clsx from "clsx";
-import { ArrowsLeftRight, DotsThree, PencilSimple, Trash } from "@phosphor-icons/react";
+import { ArrowsLeftRight, DotsThree, PencilSimple, Trash, UserPlus } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 import { assignItem, type DismissReason, dismissItem, editItem, moveItemLane, restoreItem, setItemDone, setItemDue } from "@/app/(app)/meetings/[id]/actions";
 import type { ActionItemRow, PersonSummary } from "@/lib/data/types";
 import { daysUntil, formatShortDate, relativeDue } from "@/lib/format";
 import { recordingUrl } from "@/lib/ui/evidence";
-import { type LaneKey, needsCheck, needsReview } from "@/lib/ui/lanes";
+import { type LaneKey, moveLabel, needsCheck, needsReview, type OtherSide } from "@/lib/ui/lanes";
 import type { Attendee } from "@/lib/ui/participants";
 import { firstName } from "@/lib/ui/text";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,9 @@ import { EvidenceQuote } from "./evidence-quote";
 
 // One ownership lane: header with count, open rows, the collapsed "Needs review" tray for rows the
 // model was unsure about, and "Done · n" at the end. Every change is optimistic and rolls back with
-// a plain message if the server says no.
+// a plain message if the server says no. A phone call's sheet also passes the other side (a vendor call's
+// menu says "Move to Vendor owes"), the speakers' mapped names, `seekable` when its recording can play, and
+// `me`, which puts a quiet "Assign to me" on DNY items nobody owns; meeting pages pass none of these.
 
 export interface LaneProps {
   lane: LaneKey;
@@ -35,12 +37,16 @@ export interface LaneProps {
   /** Today's date in ISO, from the server, so relative dates are the same on both sides. */
   today: string;
   emptyText: string;
+  otherSide?: OtherSide;
+  seekable?: boolean;
+  speakerNames?: Record<string, string>;
+  me?: { name: string; email: string };
 }
 
 type Patch = Partial<Pick<ActionItemRow, "status" | "owner_name" | "owner_email" | "due_date" | "title" | "details" | "owed_by">>;
 type Act = { id: string; patch: Patch };
 
-export function ActionLane({ lane, title, items, people, contacts, tldvUrl, timestampParam, today, emptyText }: LaneProps) {
+export function ActionLane({ lane, title, items, people, contacts, tldvUrl, timestampParam, today, emptyText, otherSide, seekable, speakerNames, me }: LaneProps) {
   const router = useRouter();
   const toast = useToast();
   const [optimistic, apply] = useOptimistic(items, (state: ActionItemRow[], act: Act) => state.map((i) => (i.id === act.id ? { ...i, ...act.patch } : i)));
@@ -63,7 +69,7 @@ export function ActionLane({ lane, title, items, people, contacts, tldvUrl, time
   const review = visible.filter((i) => i.status !== "done" && needsReview(i));
   const count = open.length + review.length;
 
-  const rowProps = { people, contacts, tldvUrl, timestampParam, now, mutate, lane };
+  const rowProps = { people, contacts, tldvUrl, timestampParam, now, mutate, lane, otherSide, seekable, speakerNames, me };
 
   return (
     <section id={`lane-${lane}`} aria-labelledby={`lane-${lane}-title`} className="scroll-mt-20">
@@ -119,9 +125,13 @@ interface RowProps {
   now: Date;
   inTray?: boolean;
   mutate: (id: string, patch: Patch, run: () => Promise<{ ok: boolean; error?: string }>, after?: (ok: boolean) => void) => void;
+  otherSide?: OtherSide;
+  seekable?: boolean;
+  speakerNames?: Record<string, string>;
+  me?: { name: string; email: string };
 }
 
-function ActionRow({ item, people, contacts, tldvUrl, timestampParam, now, inTray, mutate }: RowProps) {
+function ActionRow({ item, people, contacts, tldvUrl, timestampParam, now, inTray, mutate, otherSide, seekable, speakerNames, me }: RowProps) {
   const toast = useToast();
   const [editing, setEditing] = useState(false);
   const [dismissing, setDismissing] = useState(false);
@@ -129,6 +139,8 @@ function ActionRow({ item, people, contacts, tldvUrl, timestampParam, now, inTra
   const check = !done && needsCheck(item);
   const [verb, ...rest] = item.title.split(" ");
   const overdue = item.due_date ? daysUntil(item.due_date, now) < 0 : false;
+  const speaker = item.evidence_speaker ? (speakerNames?.[item.evidence_speaker] ?? item.evidence_speaker) : null;
+  const unowned = !item.owner_name && !item.owner_email;
 
   const toggleDone = (next: boolean) =>
     mutate(item.id, { status: next ? "done" : "open" }, () => setItemDone(item.id, next), (ok) => {
@@ -155,16 +167,26 @@ function ActionRow({ item, people, contacts, tldvUrl, timestampParam, now, inTra
           </>
         )}
         <div className="evidence-inline mt-2">
-          <EvidenceQuote seconds={item.evidence_ts_sec} speaker={item.evidence_speaker} quote={item.evidence_quote} verified={item.evidence_verified} />
+          <EvidenceQuote seconds={item.evidence_ts_sec} speaker={speaker} quote={item.evidence_quote} verified={item.evidence_verified} seekable={seekable} />
         </div>
       </div>
 
       <div className="flex basis-full flex-wrap items-center gap-1.5 pb-2 pl-8 md:basis-auto md:pt-1.5 md:pb-0 md:pl-0">
         {check && <Chip tone="neutral">Check</Chip>}
         <PriorityDot priority={item.priority} />
-        <OwnerPill item={item} people={people} contacts={contacts} disabled={done} mutate={mutate} />
+        <OwnerPill item={item} people={people} contacts={contacts} disabled={done} mutate={mutate} otherSide={otherSide} />
+        {me && unowned && !done && (item.owed_by === "dny" || item.owed_by === "both") && (
+          <button
+            type="button"
+            onClick={() => mutate(item.id, { owner_name: me.name, owner_email: me.email }, () => assignItem(item.id, { name: me.name, email: me.email }))}
+            className="inline-flex h-6 items-center gap-1 rounded-full px-2 text-[12px] font-medium text-ink-3 transition-colors duration-150 hover:bg-raised hover:text-ink"
+          >
+            <UserPlus size={13} aria-hidden="true" />
+            Assign to me
+          </button>
+        )}
         <DueChip item={item} now={now} overdue={overdue} disabled={done} mutate={mutate} />
-        <EvidencePill seconds={item.evidence_ts_sec} speaker={item.evidence_speaker} quote={item.evidence_quote} recordingHref={recordingUrl(tldvUrl, item.evidence_ts_sec, timestampParam)} verified={item.evidence_verified} />
+        <EvidencePill seconds={item.evidence_ts_sec} speaker={speaker} quote={item.evidence_quote} recordingHref={recordingUrl(tldvUrl, item.evidence_ts_sec, timestampParam)} verified={item.evidence_verified} />
         <Menu>
           <MenuTrigger asChild>
             <button type="button" aria-label={`More for: ${item.title}`} className="inline-flex size-9 items-center justify-center rounded-chip text-ink-3 transition-colors duration-150 hover:bg-raised hover:text-ink md:size-7 md:opacity-0 md:group-hover/row:opacity-100 md:focus-visible:opacity-100 md:data-[state=open]:opacity-100">
@@ -176,7 +198,7 @@ function ActionRow({ item, people, contacts, tldvUrl, timestampParam, now, inTra
               <PencilSimple size={16} aria-hidden="true" /> Edit
             </MenuItem>
             <MenuItem onSelect={() => mutate(item.id, { owed_by: item.owed_by === "dny" ? "client" : "dny" }, () => moveItemLane(item.id))}>
-              <ArrowsLeftRight size={16} aria-hidden="true" /> Move to {item.owed_by === "dny" ? "Client owes" : "DNY owes"}
+              <ArrowsLeftRight size={16} aria-hidden="true" /> {moveLabel(item.owed_by, otherSide)}
             </MenuItem>
             <MenuSeparator />
             <MenuItem danger onSelect={() => setDismissing(true)}>
@@ -219,7 +241,7 @@ function EditForm({ item, onDone, mutate }: { item: ActionItemRow; onDone: () =>
   );
 }
 
-function OwnerPill({ item, people, contacts, disabled, mutate }: { item: ActionItemRow; people: PersonSummary[]; contacts: Attendee[]; disabled?: boolean; mutate: RowProps["mutate"] }) {
+function OwnerPill({ item, people, contacts, disabled, mutate, otherSide }: { item: ActionItemRow; people: PersonSummary[]; contacts: Attendee[]; disabled?: boolean; mutate: RowProps["mutate"]; otherSide?: OtherSide }) {
   const label = firstName(item.owner_name) ?? item.owner_email?.split("@")[0] ?? null;
   const side = item.owed_by === "client" ? "sienna" : "bottle";
   const assign = (owner: { name: string | null; email: string | null } | null) => mutate(item.id, { owner_name: owner?.name ?? null, owner_email: owner?.email ?? null }, () => assignItem(item.id, owner));
@@ -241,7 +263,7 @@ function OwnerPill({ item, people, contacts, disabled, mutate }: { item: ActionI
       </PopoverTrigger>
       <PopoverContent className="max-h-[320px] overflow-y-auto p-1.5">
         <OwnerGroup title="DNY" options={people.map((p) => ({ key: p.email, name: p.full_name, email: p.email, hint: p.dept ?? "" }))} current={current} onPick={assign} />
-        {contacts.length > 0 && <OwnerGroup title="Client" options={contacts.map((c) => ({ key: c.email ?? c.name ?? "", name: c.name ?? c.email ?? "Attendee", email: c.email, hint: c.email && c.name ? c.email : "" }))} current={current} onPick={assign} />}
+        {contacts.length > 0 && <OwnerGroup title={otherSide?.word === "vendor" ? "Vendor" : "Client"} options={contacts.map((c) => ({ key: c.email ?? c.name ?? "", name: c.name ?? c.email ?? "Attendee", email: c.email, hint: c.email && c.name ? c.email : "" }))} current={current} onPick={assign} />}
         <PopoverClose asChild>
           <button type="button" onClick={() => assign(null)} className="mt-1 flex h-9 w-full items-center rounded-[6px] px-2 text-[13px] text-ink-3 hover:bg-raised">
             Clear owner

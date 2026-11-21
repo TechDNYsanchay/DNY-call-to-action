@@ -29,6 +29,24 @@ export type LaneKey = "dny" | "client" | "unclear";
 
 export const LANE_TITLES: Record<LaneKey, string> = { dny: "DNY owes", client: "Client owes", unclear: "Owner unclear" };
 
+/**
+ * The other party of a phone call's sheet. In a vendor call's sheet the schema's "client" side is the
+ * vendor, so the screens say "vendor" there; meeting pages pass nothing and read as before.
+ */
+export interface OtherSide {
+  word: "client" | "vendor";
+  /** The client, or the contact saved on the phone, when known. */
+  name?: string;
+}
+
+/** "Client owes" or "Vendor owes". */
+export const otherOwesTitle = (otherSide?: OtherSide): string => (otherSide?.word === "vendor" ? "Vendor owes" : LANE_TITLES.client);
+
+/** The item menu's "Move to Client owes" / "Move to Vendor owes" / "Move to DNY owes". */
+export function moveLabel(owedBy: OwnerSide, otherSide?: OtherSide): string {
+  return `Move to ${owedBy === "dny" ? otherOwesTitle(otherSide) : LANE_TITLES.dny}`;
+}
+
 /** "both" counts in each lane because each side owes something, as the saved sheet counts do. */
 export function laneOf(item: Pick<LaneItem, "owed_by">): LaneKey[] {
   if (item.owed_by === "both") return ["dny", "client"];

@@ -17,6 +17,7 @@ export type ClientRef = Pick<ClientRow, "id" | "name">;
 export type MeetingSummary = Pick<
   MeetingRow,
   | "id"
+  | "kind"
   | "tldv_meeting_id"
   | "title"
   | "happened_at"
@@ -41,7 +42,7 @@ export type MeetingSummary = Pick<
 > & { client: ClientRef | null };
 
 export const MEETING_COLUMNS =
-  "id, tldv_meeting_id, title, happened_at, duration_sec, organizer_email, organizer_name, tldv_url, type, type_source, type_confidence, type_reason, client_id, client_name_guess, transcript_ready, process_status, process_attempts, claimed_at, failure_reason, source, created_at, updated_at, client:clients(id, name)" as const;
+  "id, kind, tldv_meeting_id, title, happened_at, duration_sec, organizer_email, organizer_name, tldv_url, type, type_source, type_confidence, type_reason, client_id, client_name_guess, transcript_ready, process_status, process_attempts, claimed_at, failure_reason, source, created_at, updated_at, client:clients(id, name)" as const;
 
 export type ActionItemRow = Pick<
   Tables["action_items"]["Row"],
@@ -100,3 +101,8 @@ export type SheetRow = Pick<Tables["sheets"]["Row"], "id" | "version" | "status"
 export const SHEET_COLUMNS = "id, version, status, headline, result, model, prompt_version, created_at" as const;
 
 export type AgentRunSummary = Pick<AgentRunRow, "id" | "kind" | "status" | "attempt" | "summary" | "errors" | "created_at">;
+
+/** A phone call's facts (phone_calls): every column, named one by one, never a wildcard. */
+export type PhoneCallRow = Tables["phone_calls"]["Row"];
+export const CALL_COLUMNS =
+  "meeting_id, callyzer_call_id, line_id, direction, counterpart_masked, counterpart_name, recording_path, recording_mime, recording_bytes, recording_playable, recording_status, recording_duration_sec, speaker_count, stt_status, stt_attempts, stt_started_at, stt_next_try_at, stt_first_error_at, stt_error, stt_error_kind, stt_provider, stt_audio_sec, decision_reason, decision_since, skip_code, purged_at, purged_by, call_ended_at, seen_at, recording_seen_at, stored_at, transcribed_at, ready_at, first_claimed_at, first_sheet_at, media_deleted_at, created_at, updated_at" as const;

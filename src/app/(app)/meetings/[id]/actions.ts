@@ -24,11 +24,14 @@ async function updateItem(itemId: string, patch: ItemUpdate): Promise<{ meeting_
   return data;
 }
 
+/** Items live on meeting pages and call pages (the same table); both, and the lists, are refreshed. */
 function revalidateItemPages(meetingId: string) {
   revalidatePath(`/meetings/${meetingId}`);
+  revalidatePath(`/calls/${meetingId}`);
   revalidatePath("/mine");
   revalidatePath("/clients/[id]", "page");
   revalidatePath("/meetings");
+  revalidatePath("/calls");
 }
 
 export async function setItemDone(itemId: string, done: boolean): Promise<ActionResult> {
@@ -150,9 +153,10 @@ export async function rerunMeeting(meetingId: string): Promise<ActionResult> {
   try {
     const { person } = await requireAdmin();
     const db = supabaseAdmin();
-    const { data: meeting, error } = await db.from("meetings").select("type, transcript_ready, process_status").eq("id", meetingId).maybeSingle();
+    const { data: meeting, error } = await db.from("meetings").select("kind, type, transcript_ready, process_status").eq("id", meetingId).maybeSingle();
     if (error) throw new Error(error.message);
     if (!meeting) throw new Error("This meeting no longer exists");
+    if (meeting.kind === "call") throw new Error("This is a phone call. Use the call page");
     if (meeting.type !== "client") throw new Error("Only client meetings are analysed. Change the type first.");
     if (!meeting.transcript_ready) throw new Error("The transcript has not arrived yet, so there is nothing to analyse");
     if (meeting.process_status === "processing") throw new Error("A run is working on this meeting right now");

@@ -1,6 +1,8 @@
 import "server-only";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { applyCallClassification } from "./call-agent";
 import { matchClientName, routeClassification, type RoutedStatus } from "./classify-routing";
+import { meetingKindOf } from "./load";
 import { ClassificationSchema } from "./schema";
 import { logAgentRun, logPipelineEvent, readAgentSettings } from "./settings";
 import { zodIssues } from "./zod-issues";
@@ -9,14 +11,30 @@ export interface ClassifyOutcome {
   ok: boolean;
   /** Whether the routine should continue to the sheet for this meeting. */
   proceed: boolean;
-  status: RoutedStatus | null;
+  /** "done" only for a call whose re-run already had a sheet, which was kept. */
+  status: RoutedStatus | "done" | null;
   type: string | null;
   confidence: number | null;
   errors: string[];
+  /** Calls: the HTTP status when it is not 200 or 422 (409 when the routine's claim is gone). */
+  httpStatus?: number;
+  /** Calls: a re-run's sheet was kept although the routine said not a work call. */
+  kept?: boolean;
+  /** Calls: a not-work answer waits for a person without a time limit (known number or name; for a sure answer, also the hour's purge budget). */
+  held?: boolean;
 }
 
-/** Store the routine's classification and route the meeting: skipped, needs a decision, or on to the sheet. */
-export async function applyClassification(meetingId: string, json: unknown): Promise<ClassifyOutcome> {
+/**
+ * Store the routine's classification and route the meeting: skipped, needs a decision, or on to the sheet.
+ * A phone call goes to applyCallClassification with the routine's claim; anything else (an unknown id too)
+ * is a meeting, exactly as before.
+ */
+export async function applyClassification(meetingId: string, json: unknown, claim: string | null = null): Promise<ClassifyOutcome> {
+  if ((await meetingKindOf(meetingId)) === "call") return applyCallClassification(meetingId, json, claim);
+  return applyMeetingClassification(meetingId, json);
+}
+
+async function applyMeetingClassification(meetingId: string, json: unknown): Promise<ClassifyOutcome> {
   const parsed = ClassificationSchema.safeParse(json);
   if (!parsed.success) return { ok: false, proceed: false, status: null, type: null, confidence: null, errors: zodIssues(parsed.error) };
   const c = parsed.data;

@@ -1,0 +1,70 @@
+{
+  "meeting": {
+    "id": "7d0c5a1e-3b2f-4c6d-9e8f-0a1b2c3d4e5f",
+    "title": "Saffron Court October review",
+    "dateIst": "Wednesday, 4 November 2026, 10:30 IST",
+    "dateIsoIst": "2026-11-04",
+    "durationSec": 3725,
+    "durationText": "1 h 02 min",
+    "tldvUrl": "https://app.tldv.io/meetings/tldv-fixture-0001",
+    "client": {
+      "name": "Saffron Court Hotel",
+      "status": "active"
+    },
+    "attempt": 2
+  },
+  "participants": [
+    {
+      "name": "Priya Nair",
+      "side": "dny",
+      "role": "Account management",
+      "emailDomain": "dnyhospitality.com"
+    },
+    {
+      "name": "Rakesh Agarwal",
+      "side": "client",
+      "role": null,
+      "emailDomain": "saffroncourt.example"
+    },
+    {
+      "name": "Sunita Rao",
+      "side": "client",
+      "role": null,
+      "emailDomain": "gmail.com"
+    },
+    {
+      "name": null,
+      "side": "unknown",
+      "role": null,
+      "emailDomain": "outside.example"
+    },
+    {
+      "name": "Arjun Mehta",
+      "side": "dny",
+      "role": "Operations",
+      "emailDomain": "dnyhospitality.com"
+    }
+  ],
+  "classification": {
+    "decided": false,
+    "type": "unknown",
+    "source": "rule",
+    "confidence": 0.5,
+    "reason": "No rule decided this meeting; the routine reads the transcript.",
+    "threshold": 0.8
+  },
+  "language": {
+    "hint": "hinglish",
+    "speakerLabelsReliable": true,
+    "note": "Hinglish: Hindi and English mixed, mostly in Latin script. Speaker labels map to known people."
+  },
+  "transcript": [
+    "[0:30] Priya Nair (DNY): Good morning everyone, thank you for joining. Rakesh ji, can you hear us?",
+    "[0:52] Rakesh Agarwal (Client): Haan Priya, awaaz aa rahi hai. Chalo shuru karte hain, mere paas gyarah baje tak ka time hai.",
+    "[1:15] Speaker 3: Sorry, I joined from the phone, the link was not working.",
+    "[1:54] Arjun Mehta (DNY): October occupancy closed at 72 percent against 65 in September.",
+    "[2:38] Sunita Rao (Client): 72 percent is good, lekin OTA share badhti ja rahi hai.",
+    "[1:01:40] Arjun Mehta (DNY): One more thing: the weekly MIS goes out every Monday before ten."
+  ],
+  "guide": "/api/agent/guide"
+}

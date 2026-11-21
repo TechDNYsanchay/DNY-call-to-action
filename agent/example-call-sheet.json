@@ -1,0 +1,123 @@
+{
+  "headline": "DNY will send the revised menu costing by Friday, and Rakesh will share three months of vendor bills to bring food cost down from 41%.",
+  "executive_summary": [
+    "Food cost is running at 41% against a 34% target, driven by paneer and dairy rates; the dairy bill alone was 1.8 lakh last month.",
+    "DNY sends the revised menu costing with portion sizes by Friday, keeping selling prices unchanged; Rakesh sends the last three months of vendor bills by tomorrow so DNY can negotiate rates, and they speak again on Monday."
+  ],
+  "meeting_purpose": "operations",
+  "language_profile": {
+    "primary": "hinglish",
+    "mixed": true,
+    "notes": "Both sides spoke Hinglish; the dairy bill was said in lakh."
+  },
+  "action_items": [
+    {
+      "id": "A1",
+      "title": "Send revised menu costing with portion sizes",
+      "details": "Food cost is 41% against a 34% target. The revised costing keeps selling prices the same and brings the cost down through portion sizes and recipes.",
+      "owed_by": "dny",
+      "owner": { "name": "Ashwini Bhambani", "side": "dny", "basis": "volunteered" },
+      "due": { "kind": "relative_phrase", "date": "2026-11-20", "raw_phrase": "Friday tak", "basis": "call on Wed 18 Nov; Friday = 20 Nov" },
+      "priority": "high",
+      "linked_decision_id": "D1",
+      "evidence": [
+        { "timestamp": "0:59", "speaker": "Speaker 2", "quote": "Aur main revised menu costing Friday tak bhej dungi, portion size ke saath.", "quote_english": "And I will send the revised menu costing by Friday, with portion sizes." }
+      ],
+      "confidence": 0.93
+    },
+    {
+      "id": "A2",
+      "title": "Share last three months of vendor bills",
+      "details": "DNY asked for the bills to see where supplier rates can be negotiated; Rakesh will send them on WhatsApp.",
+      "owed_by": "client",
+      "owner": { "name": "Rakesh Cafe 89", "side": "client", "basis": "volunteered" },
+      "due": { "kind": "relative_phrase", "date": "2026-11-19", "raw_phrase": "kal tak", "basis": "call on Wed 18 Nov; 'kal' for sending the bills = Thu 19 Nov" },
+      "priority": "medium",
+      "linked_decision_id": null,
+      "evidence": [
+        { "timestamp": "0:52", "speaker": "Speaker 1", "quote": "Theek hai, main kal tak saare vendor bills WhatsApp pe bhej deta hoon.", "quote_english": "Fine, I will send all the vendor bills on WhatsApp by tomorrow." },
+        { "timestamp": "0:41", "speaker": "Speaker 2", "quote": "Isiliye mujhe aapke vendor bills chahiye, last teen mahine ke.", "quote_english": "That is why I need your vendor bills, for the last three months." }
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "statement": "Menu selling prices stay the same; food cost is brought down through portion sizes and recipes.",
+      "decided_by": "joint",
+      "evidence": [
+        { "timestamp": "1:17", "speaker": "Speaker 2", "quote": "Bilkul, selling price same rakhenge, portion aur recipe se cost kam karenge.", "quote_english": "Of course, we will keep the selling price the same and bring the cost down through portions and recipes." },
+        { "timestamp": "1:08", "speaker": "Speaker 1", "quote": "Bas dhyan rakhna ki dishes ke rate customer ke liye zyada na badhein.", "quote_english": "Just make sure the dish prices do not go up much for customers." }
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "key_facts": [
+    {
+      "id": "F1",
+      "fact": "Food cost is 41% against a 34% target.",
+      "category": "metric",
+      "normalized_value": "41% (target 34%)",
+      "evidence": [
+        { "timestamp": "0:18", "speaker": "Speaker 2", "quote": "Abhi food cost 41 percent aa raha hai, target 34 percent ka hai.", "quote_english": "Food cost is now 41 percent; the target is 34 percent." }
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "fact": "Last month's dairy bill alone was 1.8 lakh.",
+      "category": "money",
+      "normalized_value": "INR 180000",
+      "evidence": [
+        { "timestamp": "0:30", "speaker": "Speaker 1", "quote": "Pichhle mahine sirf dairy ka bill 1.8 lakh aaya tha.", "quote_english": "Last month the dairy bill alone came to 1.8 lakh." }
+      ],
+      "confidence": 0.95
+    }
+  ],
+  "risks": [
+    {
+      "id": "R1",
+      "description": "The dairy supplier raises its rates every month, which keeps pushing food cost up.",
+      "severity": "medium",
+      "affects": "client",
+      "mitigation_discussed": "DNY reviews the vendor bills to see where rates can be negotiated.",
+      "evidence": [
+        { "timestamp": "0:30", "speaker": "Speaker 1", "quote": "Haan, dairy wala har mahine rate badha deta hai.", "quote_english": "Yes, the dairy supplier raises the rate every month." }
+      ],
+      "confidence": 0.8
+    }
+  ],
+  "open_questions": [],
+  "next_meeting": {
+    "mentioned": true,
+    "date": "2026-11-23",
+    "raw_phrase": "Monday ko phir call karte hain",
+    "purpose": "Follow-up call to go through the revised costing.",
+    "evidence": [
+      { "timestamp": "1:27", "speaker": "Speaker 1", "quote": "Monday ko phir call karte hain, tab costing dekh lenge.", "quote_english": "Let us talk again on Monday; we will look at the costing then." },
+      { "timestamp": "1:35", "speaker": "Speaker 2", "quote": "Haan, Monday ko main call karti hoon.", "quote_english": "Yes, I will call on Monday." }
+    ],
+    "confidence": 0.9
+  },
+  "client_sentiment": {
+    "label": "positive",
+    "summary": "Rakesh was cooperative and agreed to send the bills at once; his one concern was that dish prices should not rise for customers.",
+    "drivers": ["agreed to share the vendor bills", "worried about dish prices rising"],
+    "evidence": [
+      { "timestamp": "1:08", "speaker": "Speaker 1", "quote": "Friday theek hai. Bas dhyan rakhna ki dishes ke rate customer ke liye zyada na badhein.", "quote_english": "Friday is fine. Just make sure the dish prices do not go up much for customers." }
+    ],
+    "confidence": 0.8
+  },
+  "participants": [
+    { "speaker_label": "Speaker 1", "name": "Rakesh Cafe 89", "side": "client", "role_guess": null, "confidence": 0.85 },
+    { "speaker_label": "Speaker 2", "name": "Ashwini Bhambani", "side": "dny", "role_guess": null, "confidence": 0.9 }
+  ],
+  "quality": {
+    "transcript_quality": "good",
+    "speaker_labels_reliable": true,
+    "issues": [],
+    "unresolved_references": ["'kal tak' for the vendor bills is taken as the day after the call"]
+  },
+  "overall_confidence": 0.9
+}

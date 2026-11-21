@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dueBucket, groupByDue, needsCheck, needsReview, openCounts, splitLanes, type LaneItem } from "./lanes";
+import { dueBucket, groupByDue, moveLabel, needsCheck, needsReview, openCounts, otherOwesTitle, splitLanes, type LaneItem } from "./lanes";
 
 const item = (over: Partial<LaneItem> & { id: string }): LaneItem => ({ owed_by: "dny", status: "open", confidence: 0.9, evidence_verified: true, due_date: null, ...over });
 // 2026-11-04 10:30 IST
@@ -37,5 +37,13 @@ describe("lanes", () => {
     const groups = groupByDue([{ due_date: null }, { due_date: "2026-11-06" }, { due_date: "2026-11-05" }], now);
     expect(groups.map((g) => g.key)).toEqual(["week", "none"]);
     expect(groups[0].rows.map((r) => r.due_date)).toEqual(["2026-11-05", "2026-11-06"]);
+  });
+
+  it("names the other lane by the call's other side", () => {
+    expect(moveLabel("dny")).toBe("Move to Client owes");
+    expect(moveLabel("dny", { word: "vendor", name: "Sharma Traders" })).toBe("Move to Vendor owes");
+    expect(moveLabel("client", { word: "vendor" })).toBe("Move to DNY owes");
+    expect(moveLabel("both")).toBe("Move to DNY owes");
+    expect(otherOwesTitle({ word: "client" })).toBe("Client owes");
   });
 });

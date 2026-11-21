@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { HTMLAttributes, ReactNode } from "react";
-import type { Priority } from "@/lib/ui/lanes";
+import type { OtherSide, Priority } from "@/lib/ui/lanes";
 import { PRIORITY_WORDS } from "@/lib/ui/lanes";
 import type { Tone } from "@/lib/ui/status";
 import { initials } from "@/lib/ui/text";
@@ -89,10 +89,10 @@ export function AvatarStack({ people, max = 5 }: { people: Array<{ name: string 
   );
 }
 
-/** The three mono counts of an inbox row: DNY-owed, client-owed, decisions. */
-export function CountTriple({ dny, client, decisions, className }: { dny: number; client: number; decisions: number; className?: string }) {
+/** The three mono counts of an inbox row: DNY-owed, client-owed (or vendor-owed on a vendor call), decisions. */
+export function CountTriple({ dny, client, decisions, className, otherSide }: { dny: number; client: number; decisions: number; className?: string; otherSide?: OtherSide }) {
   return (
-    <span className={clsx("inline-flex items-baseline gap-2 font-mono text-[13px] tnum", className)} aria-label={`${dny} for DNY, ${client} for client, ${decisions} decisions`}>
+    <span className={clsx("inline-flex items-baseline gap-2 font-mono text-[13px] tnum", className)} aria-label={`${dny} for DNY, ${client} for ${otherSide?.word ?? "client"}, ${decisions} decisions`}>
       <span className={dny ? "text-bottle" : "text-ink-3"}>{dny}</span>
       <span className="text-hairline" aria-hidden="true">
         ·

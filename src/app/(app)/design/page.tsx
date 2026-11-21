@@ -2,7 +2,15 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { requireUser } from "@/lib/auth/require-user";
+import { callFailureText, callStage, callTimeline, callTypeChip, callWho, formatCallWhen } from "@/lib/ui/call-status";
 import type { ProcessStatus } from "@/lib/ui/status";
+import { CallDecision } from "@/components/calls/call-decision";
+import { CallHeader } from "@/components/calls/call-header";
+import { CallListRow } from "@/components/calls/call-list-row";
+import { CallSheet } from "@/components/calls/call-sheet";
+import { RecordingAvailability } from "@/components/calls/recording-availability";
+import { RecordingPlayer } from "@/components/calls/recording-player";
+import { RecordingProvider } from "@/components/calls/recording-provider";
 import { MeetingListRow } from "@/components/inbox/meeting-list-row";
 import { ActionLane } from "@/components/meeting/action-lane";
 import { ClassificationBanner } from "@/components/meeting/classification-banner";
@@ -17,7 +25,7 @@ import { Field, Input, NativeSelect } from "@/components/ui/fields";
 import { ListGroup } from "@/components/ui/page-header";
 import { ActionRowSkeleton, RowSkeleton, SheetSkeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState, InlineNote, QuietLine } from "@/components/ui/states";
-import { attendees, clientItems, dnyItems, inboxRows, people, sampleClient, sampleMeeting, sheetView } from "./fixtures";
+import { attendees, callRows, clientItems, dnyItems, inboxRows, people, sampleClient, sampleLine, sampleMeeting, sheetView } from "./fixtures";
 
 export const metadata: Metadata = { title: "Design review" };
 
@@ -42,6 +50,8 @@ export default async function DesignPage() {
   const laneProps = { people, contacts: attendees.filter((a) => a.side === "client"), tldvUrl: "https://app.tldv.io/meetings/sample", timestampParam: "t", today };
   const ctx = { tldvUrl: "https://app.tldv.io/meetings/sample", timestampParam: "t" };
   const done = sampleMeeting("done");
+  const stageOptions = { now: new Date(today), pipelinePaused: false, claimTimeoutMin: 20, decisionHours: 24, undecidedFailedDays: 3 };
+  const vendorCall = callRows.find((r) => r.type === "vendor")!;
 
   const content = (
     <>
@@ -180,6 +190,68 @@ export default async function DesignPage() {
           <InlineNote title="A plain note" tone="bottle">
             Inset background, 3 px bar, no fill.
           </InlineNote>
+        </div>
+      </Block>
+
+      <Block title="Calls list, every stage">
+        <ListGroup title="Every stage" count={callRows.length}>
+          {callRows.map((row) => (
+            <CallListRow key={row.id} row={row} lines={new Map([[sampleLine.id, sampleLine]])} stageOptions={stageOptions} now={new Date(today)} />
+          ))}
+        </ListGroup>
+      </Block>
+
+      <Block title="Call header, vendor sheet, decision">
+        <div className="flex flex-col gap-4">
+          <div className="card p-5">
+            <CallHeader
+              headline={vendorCall.headline ?? "Vendor call"}
+              provisional={false}
+              who={callWho(vendorCall, vendorCall.call)}
+              chip={callTypeChip(vendorCall.type)}
+              stage={callStage(vendorCall, vendorCall.call, stageOptions)}
+              when={formatCallWhen(vendorCall.happened_at)}
+              durationSec={vendorCall.duration_sec}
+              direction={vendorCall.call.direction}
+              line="Ashwini's phone"
+              callBack="+919820000000"
+            />
+            <CallSheet
+              view={sheetView}
+              items={[...dnyItems, ...clientItems]}
+              otherSide={{ word: "vendor", name: "Sharma Traders" }}
+              ctx={{ tldvUrl: null, timestampParam: null, otherSide: { word: "vendor", name: "Sharma Traders" }, speakerNames: { "Rakesh Agarwal": "Rakesh (vendor)" } }}
+              people={people}
+              contacts={[{ name: "Sharma Traders", email: null, side: "client", is_organizer: false }]}
+              me={{ name: "Priya Nair", email: "priya.nair@dnyhospitality.com" }}
+              today={today}
+            />
+          </div>
+          <div className="card p-5">
+            <CallDecision callId={callRows[0].id} hint={callStage(callRows[0], callRows[0].call, stageOptions).hint} clients={[sampleClient]} guess={null} defaultClientId={null} canDelete />
+          </div>
+        </div>
+      </Block>
+
+      <Block title="Call timeline, every stage before the sheet">
+        <div className="grid gap-4 md:grid-cols-2">
+          {callRows.slice(0, 6).map((row) => (
+            <div key={row.id} className="card p-4">
+              <p className="mb-3 font-mono text-[12px] text-ink-3">{callStage(row, row.call, stageOptions).key}</p>
+              <ProcessingTimeline meeting={{ ...row, failure_reason: callFailureText(row.failure_reason) }} steps={callTimeline(row, row.call, callStage(row, row.call, stageOptions).hint)} />
+            </div>
+          ))}
+        </div>
+      </Block>
+
+      <Block title="Player, when it cannot play">
+        <div className="flex flex-col gap-3">
+          {(["not_work", "deleted", "unplayable"] as const).map((status) => (
+            <RecordingProvider key={status} callId={`design-${status}`}>
+              <RecordingAvailability status={status} title="Sample call" artist="Ashwini's phone" lengthSec={252} />
+              <RecordingPlayer availability={status} lengthSec={252} spans={[]} speakerTones={[]} ticks={[]} />
+            </RecordingProvider>
+          ))}
         </div>
       </Block>
 

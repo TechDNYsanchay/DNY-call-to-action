@@ -1,7 +1,7 @@
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/require-user";
 import { getMeetingHeader, getTranscriptTurns } from "@/lib/data/meetings";
 import { formatDateTimeIst, formatTimestamp } from "@/lib/format";
@@ -25,6 +25,8 @@ export default async function TranscriptPage({ params }: { params: Params }) {
   await requireUser();
   const [meeting, transcript] = await Promise.all([getMeetingHeader(id), getTranscriptTurns(id)]);
   if (!meeting) notFound();
+  // A phone call's transcript is on its call page, next to the recording.
+  if (meeting.kind === "call") redirect(`/calls/${id}#transcript`);
   const turns = parseTurns(transcript?.turns ?? null);
   const speakers = [...new Set(turns.map((t) => t.speaker))];
 

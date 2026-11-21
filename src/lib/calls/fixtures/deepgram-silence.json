@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "transaction_key": "deprecated",
+    "request_id": "7a1d2c3b-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+    "sha256": "07ce45aad7c4b615ef83d209654700ef9cfe57b5c12919d6f89e19a6f339f281",
+    "created": "2026-11-19T08:40:12.511Z",
+    "duration": 62,
+    "channels": 1,
+    "models": [
+      "2187e11a-3532-4498-b076-81fa530bdd49"
+    ],
+    "model_info": {
+      "2187e11a-3532-4498-b076-81fa530bdd49": {
+        "name": "general-nova-3",
+        "version": "2025-07-31.0",
+        "arch": "nova-3"
+      }
+    }
+  },
+  "results": {
+    "channels": [
+      {
+        "alternatives": [
+          {
+            "transcript": "",
+            "confidence": 0,
+            "words": [],
+            "languages": []
+          }
+        ],
+        "detected_language": "hi",
+        "language_confidence": 0.82
+      }
+    ]
+  }
+}

@@ -1,20 +1,20 @@
 "use client";
 
 import clsx from "clsx";
-import { Buildings, CalendarPlus, GearSix, ListChecks, Tray, UserCircleCheck } from "@phosphor-icons/react";
+import { Buildings, CalendarPlus, GearSix, ListChecks, PhoneCall, Tray, UserCircleCheck } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Tooltip, TooltipProvider } from "@/components/ui/primitives";
 
 // Navigation for the three shell sizes. One list of items, three renderings: the 240 px rail
-// (labels), the 64 px icon rail (tooltips) and the phone tab bar (four items, Settings via the
-// avatar). Active state comes from the pathname so the server shell stays static.
+// (labels), the 64 px icon rail (tooltips) and the phone tab bar (five items, six with Calls;
+// Settings via the avatar). Active state comes from the pathname so the server shell stays static.
 
-import type { NavItem, NavKey } from "./nav-items";
+import { type NavItem, type NavKey, tabItems } from "./nav-items";
 
 export type { NavItem, NavKey };
 
-const ICONS: Record<NavKey, typeof Tray> = { meetings: Tray, book: CalendarPlus, review: UserCircleCheck, mine: ListChecks, clients: Buildings, settings: GearSix };
+const ICONS: Record<NavKey, typeof Tray> = { meetings: Tray, calls: PhoneCall, book: CalendarPlus, review: UserCircleCheck, mine: ListChecks, clients: Buildings, settings: GearSix };
 
 const isActive = (pathname: string, href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
@@ -83,13 +83,16 @@ export function IconRailNav({ items }: { items: NavItem[] }) {
   );
 }
 
-/** Phone bottom tab bar: Meetings, Book, Review, Mine, Clients. Settings lives behind the avatar. */
+/**
+ * Phone bottom tab bar: Meetings, (Calls,) Book, Review, Mine, Clients. Settings lives behind the avatar.
+ * Six tabs are about 53 px each at 320 px, still wide enough for "Meetings" at 11 px.
+ */
 export function TabBar({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
-  const tabs = items.filter((i) => i.key !== "settings");
+  const tabs = tabItems(items);
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-hairline bg-canvas/95 pb-safe backdrop-blur md:hidden">
-      <ul className="grid h-14 grid-cols-5">
+      <ul className={clsx("grid h-14", tabs.length === 6 ? "grid-cols-6" : "grid-cols-5")}>
         {tabs.map((item) => {
           const Icon = ICONS[item.key];
           const active = isActive(pathname, item.href);

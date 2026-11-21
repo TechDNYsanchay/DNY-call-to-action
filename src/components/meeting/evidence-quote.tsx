@@ -1,16 +1,54 @@
 import clsx from "clsx";
+import { Play } from "@phosphor-icons/react/dist/ssr";
 import { formatTimestamp } from "@/lib/format";
+import { spokenTime } from "@/lib/ui/evidence";
 import { hasDevanagari } from "@/lib/ui/text";
 
 // The quote behind an item, rendered the same way inside the popover and inline on the sheet:
 // mono timestamp, speaker, the verbatim words (Devanagari in its own face), English rendering muted.
+// On a call page with a playable recording (`seekable`) the timestamp is a button the page's one seek
+// handler (SeekDelegate) plays from; `refinedSec` is the second the quote is said, when the save found it.
 
-export function EvidenceQuote({ seconds, speaker, quote, quoteEnglish, verified = true, className }: { seconds: number | null; speaker: string | null; quote: string | null; quoteEnglish?: string | null; verified?: boolean; className?: string }) {
+export function EvidenceQuote({
+  seconds,
+  speaker,
+  quote,
+  quoteEnglish,
+  verified = true,
+  className,
+  seekable,
+  refinedSec,
+}: {
+  seconds: number | null;
+  speaker: string | null;
+  quote: string | null;
+  quoteEnglish?: string | null;
+  verified?: boolean;
+  className?: string;
+  seekable?: boolean;
+  refinedSec?: number | null;
+}) {
   if (!quote) return null;
+  const seekAt = refinedSec ?? seconds;
   return (
     <blockquote className={clsx("rounded-[6px] border-l-2 border-hairline bg-inset px-3 py-2", className)}>
       <p className="flex items-baseline gap-2 text-[12px] text-ink-3">
-        {seconds != null && <span className="font-mono tnum">{formatTimestamp(seconds)}</span>}
+        {seconds != null &&
+          (seekable && seekAt != null ? (
+            <button
+              type="button"
+              data-seek={seekAt}
+              data-quote={quote}
+              data-refined={refinedSec != null ? "1" : undefined}
+              aria-label={`Play from ${spokenTime(Math.max(0, seekAt - 1))}`}
+              className="-mx-1 inline-flex items-center gap-1 rounded-[4px] px-1 font-mono text-ink-2 transition-colors duration-150 tnum hover:bg-raised hover:text-ink"
+            >
+              <Play size={9} weight="fill" aria-hidden="true" />
+              {formatTimestamp(seconds)}
+            </button>
+          ) : (
+            <span className="font-mono tnum">{formatTimestamp(seconds)}</span>
+          ))}
         {speaker && <span className="font-medium text-ink-2">{speaker}</span>}
         {!verified && <span title="The quote could not be matched exactly to the transcript">approx.</span>}
       </p>

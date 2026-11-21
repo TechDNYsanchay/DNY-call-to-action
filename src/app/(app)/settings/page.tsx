@@ -1,18 +1,23 @@
 import { ArrowSquareOut } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
+import { unstable_rethrow } from "next/navigation";
 import { SignOutButton } from "@/app/auth/signout/sign-out-button";
 import { requireUser } from "@/lib/auth/require-user";
+import { errorText } from "@/lib/calls/sanitize";
+import { getPhoneCallsAdmin, type PhoneCallsAdmin } from "@/lib/data/calls";
 import { getOpsData } from "@/lib/data/ops";
 import { listAllPeople } from "@/lib/data/people";
 import { formatDateTimeIst, timeAgo } from "@/lib/format";
 import { MAX_BACKFILL_DAYS } from "@/lib/ingest/backfill";
 import { PROMPT_VERSION } from "@/lib/sheet/schema";
 import { statusWord } from "@/lib/ui/status";
+import { PhoneCallsSettings } from "@/components/settings/phone-calls";
 import { BackfillForm, PipelineToggle, ReplayForm } from "@/components/settings/pipeline-controls";
 import { AddPersonForm, TeamTable } from "@/components/settings/team";
 import { Chip } from "@/components/ui/chip";
 import { FormRow } from "@/components/ui/fields";
 import { PageHeader } from "@/components/ui/page-header";
+import { InlineNote } from "@/components/ui/states";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -38,11 +43,23 @@ function Stat({ label, value, sub, tone }: { label: string; value: string; sub?:
   );
 }
 
-// Admins: Team, Integrations & status, About. Members: a read-only "Your account" card.
+/** Phone calls' admin data, or null when one of its reads failed, so that never takes the rest of Settings down. */
+async function phoneCallsOrNull(): Promise<PhoneCallsAdmin | null> {
+  try {
+    return await getPhoneCallsAdmin();
+  } catch (e) {
+    unstable_rethrow(e);
+    console.warn(`phone calls settings: ${errorText(e)}`);
+    return null;
+  }
+}
+
+// Admins: Team, Integrations & status, Phone calls, About. Members: a read-only "Your account" card. Phone
+// calls load on their own: when one of their reads fails, the card says so and the meeting controls stay.
 export default async function SettingsPage() {
   const { person, isAdmin } = await requireUser();
   const now = new Date();
-  const [people, ops] = isAdmin ? await Promise.all([listAllPeople(), getOpsData()]) : [null, null];
+  const [people, ops, calls] = isAdmin ? await Promise.all([listAllPeople(), getOpsData(), phoneCallsOrNull()]) : [null, null, null];
 
   return (
     <div className="mx-auto max-w-[960px]">
@@ -108,7 +125,7 @@ export default async function SettingsPage() {
                       claude.ai/code/routines
                       <ArrowSquareOut size={13} aria-hidden="true" />
                     </a>
-                    . Confidence threshold {Math.round(ops.settings.confidence_threshold * 100)}%, up to {ops.settings.max_per_run} meetings per run, {ops.settings.max_attempts} attempts before a meeting fails, claims released after {ops.settings.claim_timeout_minutes} minutes.
+                    . Confidence threshold {Math.round(ops.settings.confidence_threshold * 100)}%, up to {ops.settings.max_per_run} meetings and calls per run, {ops.settings.max_attempts} attempts before a meeting fails, claims released after {ops.settings.claim_timeout_minutes} minutes.
                   </p>
                 </FormRow>
                 <FormRow label="Replay a tl;dv meeting" hint="For testing, or when a webhook was missed.">
@@ -137,6 +154,16 @@ export default async function SettingsPage() {
                   </ol>
                 )}
               </div>
+            </Card>
+
+            <Card id="phone-calls" title="Phone calls" description="Calls on DNY's client-work phones, from Callyzer: transcribed by Deepgram, then a sheet for client and vendor calls.">
+              {calls ? (
+                <PhoneCallsSettings data={calls} nowIso={now.toISOString()} />
+              ) : (
+                <InlineNote tone="signal" title="Phone calls could not be loaded">
+                  Reload the page to try again. Calls keep being read and analysed meanwhile.
+                </InlineNote>
+              )}
             </Card>
 
             <Card id="about" title="About">

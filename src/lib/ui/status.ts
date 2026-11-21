@@ -58,6 +58,8 @@ export function typeLabel(type: MeetingType): string {
       return "Sales meeting";
     case "internal":
       return "Internal";
+    case "vendor":
+      return "Vendor";
     case "other":
       return "Other";
     case "unknown":

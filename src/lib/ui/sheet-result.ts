@@ -1,9 +1,10 @@
 // Reads the sheet JSON stored in sheets.result for display. The row was validated against
-// SheetSchema when it was saved (plus a `verification` block the server adds), so the strict parse
-// normally succeeds; if an older or hand-edited row does not, the page still renders what it can.
+// SheetSchema (a call's against CallSheetSchema, one to three summary bullets) when it was saved, plus a
+// `verification` block the server adds, so the strict parse normally succeeds; if an older or hand-edited
+// row does not, the page still renders what it can.
 
 import type { Json } from "@/lib/supabase/database.types";
-import { type Decision, type Evidence, type KeyFact, type OpenQuestion, type Risk, type Sheet, SheetSchema } from "@/lib/sheet/schema";
+import { CallSheetSchema, type Decision, type Evidence, type KeyFact, type OpenQuestion, type Risk, type Sheet, SheetSchema } from "@/lib/sheet/schema";
 
 export interface SheetVerification {
   prompt_version?: string;
@@ -11,6 +12,8 @@ export interface SheetVerification {
   warnings?: string[];
   evidence_verified?: Record<string, boolean>;
   adjusted_confidence?: Record<string, number>;
+  /** Calls: the second each quote is said, by entry id ("A1", "D2", "next_meeting"), refined at save. */
+  evidence_seconds?: Record<string, number[]>;
 }
 
 export interface SheetView {
@@ -24,6 +27,11 @@ export interface SheetView {
   next_meeting: Sheet["next_meeting"] | null;
   client_sentiment: Sheet["client_sentiment"] | null;
   quality: Sheet["quality"] | null;
+  /**
+   * Who each speaker label is (a call's "Speaker 1" -> a name and a side); [] when the strict read failed.
+   * readSheetResult always sets it; optional only so views built by hand (tests, /design fixtures) need not.
+   */
+  participants?: Sheet["participants"];
   overall_confidence: number | null;
   verification: SheetVerification;
   /** False when the strict parse failed and the arrays were read leniently. */
@@ -37,9 +45,10 @@ export function readSheetResult(result: Json | null, fallbackHeadline = ""): She
   const record = asRecord(result);
   const { verification: rawVerification, ...rest } = record;
   const verification = asRecord(rawVerification) as SheetVerification;
-  const parsed = SheetSchema.safeParse(rest);
+  const meeting = SheetSchema.safeParse(rest);
+  const parsed = meeting.success ? meeting : CallSheetSchema.safeParse(rest);
   if (parsed.success) {
-    const s = parsed.data;
+    const s: Sheet = parsed.data;
     return {
       headline: s.headline,
       executive_summary: s.executive_summary,
@@ -51,6 +60,7 @@ export function readSheetResult(result: Json | null, fallbackHeadline = ""): She
       next_meeting: s.next_meeting,
       client_sentiment: s.client_sentiment,
       quality: s.quality,
+      participants: s.participants,
       overall_confidence: s.overall_confidence,
       verification,
       complete: true,
@@ -67,6 +77,7 @@ export function readSheetResult(result: Json | null, fallbackHeadline = ""): She
     next_meeting: null,
     client_sentiment: null,
     quality: null,
+    participants: [],
     overall_confidence: typeof rest.overall_confidence === "number" ? rest.overall_confidence : null,
     verification,
     complete: false,

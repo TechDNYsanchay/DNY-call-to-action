@@ -1,7 +1,9 @@
 // Sample data for the dev-only /design route: a meeting in every state, action rows in every
-// visual state, and the example sheet the routine guide ships with. Nothing here touches the database.
+// visual state, the example sheet the routine guide ships with, and a phone call in every stage. Nothing
+// here touches the database.
 
 import example from "../../../../agent/example-sheet.json";
+import type { CallListFacts, CallRow, LineSummary } from "@/lib/data/calls";
 import type { ActionItemRow, InboxRow, MeetingSummary, PersonSummary } from "@/lib/data/types";
 import type { Attendee } from "@/lib/ui/participants";
 import type { ProcessStatus } from "@/lib/ui/status";
@@ -15,6 +17,7 @@ export const sampleClient = { id: "11111111-1111-4111-8111-111111111111", name: 
 export function sampleMeeting(status: ProcessStatus, over: Partial<MeetingSummary> = {}): MeetingSummary {
   return {
     id: `00000000-0000-4000-8000-00000000000${["new", "waiting_transcript", "ready", "processing", "needs_decision", "done", "failed", "skipped"].indexOf(status)}`,
+    kind: "meeting",
     tldv_meeting_id: `sample-${status}`,
     title: "Saffron Court | October review",
     happened_at: hoursAgo(3),
@@ -110,4 +113,50 @@ export const dnyItems: ActionItemRow[] = [
 export const clientItems: ActionItemRow[] = [
   item({ id: "c1", title: "Approve the New Year package proposal", owed_by: "client", owner_name: "Rakesh Agarwal", owner_email: "rakesh@saffroncourt.in", due_date: daysFromNow(7), priority: "medium", evidence_speaker: "Priya Nair", evidence_quote: "Rakesh ji, New Year package ka approval agle review tak de dijiye." }),
   item({ id: "c2", title: "Share the F&B payroll sheet", owed_by: "client", priority: "low" }),
+];
+
+// ------------------------------------------------------------------------------------------- Calls
+
+const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
+
+export const sampleLine: LineSummary = { id: "22222222-2222-4222-8222-222222222222", label: null, callyzer_name: "Ashwini Bhambani", enabled: true, members: [{ id: "p1", full_name: "Ashwini Bhambani" }], name: "Ashwini's phone" };
+
+function sampleCall(n: number, status: ProcessStatus, over: Partial<CallRow>, call: Partial<CallListFacts> = {}): CallRow {
+  return {
+    ...sampleMeeting(status, { kind: "call", tldv_meeting_id: null, tldv_url: null, organizer_email: null, organizer_name: null, title: null, type: "unknown", type_source: null, type_confidence: null, type_reason: null, client_id: null, client: null, client_name_guess: null, duration_sec: 252, claimed_at: null, failure_reason: null, updated_at: minutesAgo(2), ...over }),
+    id: `33333333-3333-4333-8333-00000000000${n}`,
+    headline: null,
+    counts: { dny: 0, client: 0, decisions: 0 },
+    call: {
+      direction: n % 2 ? "incoming" : "outgoing",
+      counterpart_masked: "+91 98••• ••456",
+      counterpart_name: null,
+      recording_status: "stored",
+      stt_status: "pending",
+      stt_error_kind: null,
+      stt_next_try_at: null,
+      stored_at: minutesAgo(2),
+      ready_at: null,
+      decision_reason: null,
+      decision_since: null,
+      skip_code: null,
+      purged_at: null,
+      line_id: sampleLine.id,
+      ...call,
+    },
+  };
+}
+
+/** A call in every stage of src/lib/ui/call-status.ts. */
+export const callRows: CallRow[] = [
+  sampleCall(1, "needs_decision", { transcript_ready: true }, { decision_reason: "unsure", decision_since: minutesAgo(40) }),
+  sampleCall(2, "failed", { transcript_ready: true, failure_reason: "The routine gave up on this meeting after 3 attempts." }),
+  sampleCall(3, "waiting_transcript", { transcript_ready: false }),
+  sampleCall(4, "waiting_transcript", { transcript_ready: false }, { stt_error_kind: "server", stt_next_try_at: minutesAgo(-4) }),
+  sampleCall(5, "ready", { transcript_ready: true }, { ready_at: minutesAgo(1) }),
+  sampleCall(6, "processing", { transcript_ready: true, claimed_at: minutesAgo(2) }),
+  { ...sampleCall(7, "done", { type: "client", client: sampleClient, client_id: sampleClient.id, title: "Call with Rakesh (Saffron Court Hotel)", transcript_ready: true }, { counterpart_name: "Rakesh Saffron" }), headline: "Revised menu costing goes to the owner by Friday", counts: { dny: 2, client: 1, decisions: 1 } },
+  { ...sampleCall(8, "done", { type: "vendor", title: "Vendor call with Sharma Traders", transcript_ready: true }, { counterpart_name: "Sharma Traders" }), headline: "Sharma Traders sends the corrected linen bill tomorrow", counts: { dny: 1, client: 1, decisions: 0 } },
+  sampleCall(9, "skipped", { type_reason: "Personal call. The recording and transcript were deleted." }, { skip_code: "personal", purged_at: minutesAgo(30), recording_status: "deleted" }),
+  sampleCall(0, "skipped", { type_reason: "No speech in the recording. The recording was deleted." }, { skip_code: "no_speech", purged_at: minutesAgo(50), recording_status: "deleted" }),
 ];

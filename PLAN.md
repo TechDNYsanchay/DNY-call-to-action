@@ -426,6 +426,22 @@ component in every state in both themes.
   `retention_months` (default 12, to confirm); sheets are kept. Admin "Delete meeting data" action with an audit
   row (the tl;dv recording must be deleted by hand).
 - Third-party processors to confirm with DNY: Anthropic (API default retention 30 days), Resend (30-day logs).
+  Phone calls (2026-11) add: Callyzer (it keeps every recording at a link that never expires), Deepgram (US
+  endpoint, nova-3; `mip_opt_out` on by default, so recordings are not used for model training) and the Claude
+  account that owns the routine (its session history keeps the call packages it processed, including undecided
+  calls' transcripts). Sales QA keeps its own copy of calls of 2 minutes or more on the same lines.
+- Phone calls' retention: calls that are not work calls (personal, internal, sales, wrong number, no content),
+  calls with no speech and calls on a line switched off are deleted at once (recording, transcript, sheet), leaving a
+  stub with the masked number and a fixed reason; undecided calls are deleted after 24 h when the routine was
+  unsure (unless the number or the saved contact name is known business: then the call is held for a person),
+  3 days when they failed, 30 days in any state; business calls' recordings are deleted after
+  `calls_audio_retention_days` (30) while their sheets stay; ledger rows that never became calls after 14 days;
+  recordings nothing points at after a day (nightly sweep). Transcripts follow `retention_months` like meetings'.
+- Phone calls' visibility: business (client and vendor) calls are readable by the whole team like meetings;
+  until a call is confirmed as business, its transcript sits in a secret-key-only table and its recording,
+  transcript and download are shown only to admins and the people on its line. A call the routine labelled client
+  or vendor on one run and hands to a person on a later run (no sheet came of it) is undecided again: `hold_call`
+  clears the type, client, guess, title and saved name and moves the turns back to the secret store.
 - Security: webhook secret in a custom header, replay window 24 h, Vercel WAF rate limit on `/api/webhooks/*`,
   service-role key only in server code paths never reachable from a page render, secrets added from files, never
   on the command line, `.env.example` committed with empty values.

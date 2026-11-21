@@ -12,6 +12,17 @@ export type MeetingType = Database["public"]["Enums"]["meeting_type"];
 export type TypeSource = Database["public"]["Enums"]["type_source"];
 export type MeetingSource = "webhook" | "poll" | "backfill" | "manual" | "seed";
 
+/** A meetings row is a tl;dv meeting or a phone call from Callyzer (meetings.kind). */
+export type ConversationKind = "meeting" | "call";
+
+/** Which types get a sheet: client meetings; client and vendor calls (a vendor's sheet treats the vendor as the other side). */
+export const ELIGIBLE_TYPES: Record<ConversationKind, ReadonlySet<MeetingType>> = {
+  meeting: new Set<MeetingType>(["client"]),
+  call: new Set<MeetingType>(["client", "vendor"]),
+};
+
+export const isEligibleType = (kind: ConversationKind, type: MeetingType): boolean => ELIGIBLE_TYPES[kind].has(type);
+
 /** What intake needs to know about the stored row before touching it. */
 export interface MeetingState {
   type: MeetingType;

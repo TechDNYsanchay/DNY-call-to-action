@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
+import exampleCallSheet from "../../../agent/example-call-sheet.json";
+import exampleCallTranscript from "../../../agent/example-call-transcript.json";
 import exampleSheet from "../../../agent/example-sheet.json";
 import exampleTranscript from "../../../agent/example-transcript.json";
 import { parseTldvTranscript } from "@/lib/tldv/parse";
 import type { SpeakerTurn } from "@/lib/tldv/turns";
-import { ClassificationSchema, classificationJsonSchema, SheetSchema, sheetJsonSchema } from "./schema";
+import { CallClassificationSchema, CallSheetSchema, ClassificationSchema, classificationJsonSchema, SheetSchema, sheetJsonSchema } from "./schema";
 import { countsOf, splitModel } from "./sheet-body";
 import { buildTranscriptLines } from "./transcript-lines";
 import { checkSheet } from "./verify";
@@ -53,6 +55,45 @@ describe("agent/example-sheet.json", () => {
   });
 });
 
+describe("agent/example-call-sheet.json", () => {
+  const callTurns = exampleCallTranscript as SpeakerTurn[];
+
+  it("passes the call sheet schema, with two summary bullets", () => {
+    const parsed = CallSheetSchema.safeParse(exampleCallSheet);
+    expect(parsed.success ? [] : zodIssues(parsed.error)).toEqual([]);
+    expect(exampleCallSheet.executive_summary).toHaveLength(2);
+  });
+
+  it("passes every server check against its own transcript as a call, with no warnings", () => {
+    const sheet = CallSheetSchema.parse(exampleCallSheet);
+    const result = checkSheet(sheet, {
+      kind: "call",
+      turns: callTurns,
+      durationSec: 105,
+      meetingDateIst: "2026-11-18",
+      // A call's names: the line's person and the contact name saved on the phone.
+      participantNames: ["Ashwini Bhambani", "Rakesh Cafe 89"],
+      speakerLabels: [...new Set(callTurns.map((t) => t.speaker))],
+    });
+    expect(result.errors).toEqual([]);
+    expect(result.warnings).toEqual([]);
+    expect(Object.values(result.evidenceVerified).every(Boolean)).toBe(true);
+    expect(countsOf(sheet)).toMatchObject({ dny: 1, client: 1, decisions: 1 });
+    expect(sheet.action_items.every((a) => a.owner.side !== "unknown")).toBe(true);
+    expect(sheet.key_facts.filter((f) => f.category === "money")).toHaveLength(1);
+    expect(sheet.next_meeting.mentioned).toBe(true);
+  });
+
+  it("is a two-minute Hinglish call between two machine-labelled voices", () => {
+    const lines = buildTranscriptLines(callTurns, [], []);
+    expect(lines.language.hint).toBe("hinglish");
+    expect(lines.speakerLabelsReliable).toBe(false);
+    expect(lines.lines[0]).toBe("[0:00] Speaker 1: Hello, haan Ashwini ji, boliye.");
+    expect(new Set(callTurns.map((t) => t.speaker))).toEqual(new Set(["Speaker 1", "Speaker 2"]));
+    expect(callTurns.at(-1)!.endSec).toBeLessThan(120);
+  });
+});
+
 describe("published JSON schemas", () => {
   it("are draft-7 documents with the top-level fields", () => {
     const sheet = sheetJsonSchema() as { $schema?: string; required?: string[] };
@@ -63,6 +104,7 @@ describe("published JSON schemas", () => {
   });
   it("classification example validates", () => {
     expect(ClassificationSchema.safeParse({ type: "client", confidence: 0.92, reason: "Monthly review with an existing client.", evidence: [], client_name_guess: "Saffron Court", language: "hinglish" }).success).toBe(true);
+    expect(CallClassificationSchema.safeParse({ type: "personal", confidence: 0.9, reason: "Personal call", evidence: [], client_name_guess: null, language: "hindi" }).success).toBe(true);
   });
 });
 

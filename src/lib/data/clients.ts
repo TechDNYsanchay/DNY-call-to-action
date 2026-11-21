@@ -23,7 +23,7 @@ export async function listClients(): Promise<ClientListRow[]> {
   const [clients, items, meetings] = await Promise.all([
     db.from("clients").select(CLIENT_COLUMNS).order("name"),
     db.from("action_items").select("owed_by, meeting:meetings!inner(client_id)").in("status", ["open", "in_progress"]).in("owed_by", ["dny", "both"]).limit(2000),
-    db.from("meetings").select("client_id, happened_at").not("client_id", "is", null).order("happened_at", { ascending: false }).limit(2000),
+    db.from("meetings").select("client_id, happened_at").eq("kind", "meeting").not("client_id", "is", null).order("happened_at", { ascending: false }).limit(2000),
   ]);
   fail("clients", clients.error);
   fail("action_items", items.error);
@@ -50,20 +50,31 @@ export interface ClientMeeting extends MeetingSummary {
 export interface ClientPageData {
   client: ClientSummary;
   meetings: ClientMeeting[];
-  /** Open items across this client's meetings, with the meeting they came from. */
-  items: Array<ActionItemRow & { meeting_title: string | null; meeting_happened_at: string }>;
+  /** The client's phone calls (not the deleted ones), newest first. */
+  calls: ClientMeeting[];
+  /** Open items across this client's meetings and calls, with the meeting or call they came from. */
+  items: Array<ActionItemRow & { meeting_title: string | null; meeting_happened_at: string; meeting_kind: string }>;
 }
 
+/**
+ * One client: its meetings (up to 100, as before) and its phone calls (up to 50) in two separate reads, so
+ * calls never push meetings off the page; then the headlines and the open items of both.
+ */
 export async function getClientPage(id: string): Promise<ClientPageData | null> {
   const db = await supabaseServer();
-  const { data: client, error } = await db.from("clients").select(CLIENT_COLUMNS).eq("id", id).maybeSingle();
+  const [{ data: client, error }, meetingRows, callRows] = await Promise.all([
+    db.from("clients").select(CLIENT_COLUMNS).eq("id", id).maybeSingle(),
+    db.from("meetings").select(MEETING_COLUMNS).eq("client_id", id).eq("kind", "meeting").order("happened_at", { ascending: false }).limit(100),
+    db.from("meetings").select(MEETING_COLUMNS).eq("client_id", id).eq("kind", "call").neq("process_status", "skipped").order("happened_at", { ascending: false }).limit(50),
+  ]);
   fail("clients", error);
+  fail("meetings", meetingRows.error);
+  fail("meetings", callRows.error);
   if (!client) return null;
-  const { data: meetingRows, error: mError } = await db.from("meetings").select(MEETING_COLUMNS).eq("client_id", id).order("happened_at", { ascending: false }).limit(100);
-  fail("meetings", mError);
-  const meetings = (meetingRows ?? []) as MeetingSummary[];
-  const ids = meetings.map((m) => m.id);
-  if (!ids.length) return { client, meetings: [], items: [] };
+  const meetings = (meetingRows.data ?? []) as MeetingSummary[];
+  const calls = (callRows.data ?? []) as MeetingSummary[];
+  const ids = [...meetings, ...calls].map((m) => m.id);
+  if (!ids.length) return { client, meetings: [], calls: [], items: [] };
   const [sheets, items] = await Promise.all([
     db.from("sheets").select("meeting_id, version, headline").in("meeting_id", ids).eq("status", "ready").order("version", { ascending: false }),
     db.from("action_items").select(ITEM_COLUMNS).in("meeting_id", ids).in("status", ["open", "in_progress"]).order("due_date", { ascending: true, nullsFirst: false }).limit(500),
@@ -72,11 +83,13 @@ export async function getClientPage(id: string): Promise<ClientPageData | null> 
   fail("action_items", items.error);
   const headlines = new Map<string, string>();
   for (const s of sheets.data ?? []) if (!headlines.has(s.meeting_id)) headlines.set(s.meeting_id, s.headline);
-  const byId = new Map(meetings.map((m) => [m.id, m]));
+  const byId = new Map([...meetings, ...calls].map((m) => [m.id, m]));
+  const withHeadline = (m: MeetingSummary): ClientMeeting => ({ ...m, headline: headlines.get(m.id) ?? null });
   return {
     client,
-    meetings: meetings.map((m) => ({ ...m, headline: headlines.get(m.id) ?? null })),
-    items: (items.data ?? []).map((i) => ({ ...i, meeting_title: byId.get(i.meeting_id)?.title ?? null, meeting_happened_at: byId.get(i.meeting_id)?.happened_at ?? "" })),
+    meetings: meetings.map(withHeadline),
+    calls: calls.map(withHeadline),
+    items: (items.data ?? []).map((i) => ({ ...i, meeting_title: byId.get(i.meeting_id)?.title ?? null, meeting_happened_at: byId.get(i.meeting_id)?.happened_at ?? "", meeting_kind: byId.get(i.meeting_id)?.kind ?? "meeting" })),
   };
 }
 

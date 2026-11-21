@@ -6,7 +6,9 @@ import { retryingFetch } from "@/lib/supabase/retry-fetch";
 
 // Runs before every page: refreshes the Supabase session cookie and sends anyone who is not
 // signed in to /login. The refresh has to happen here because pages cannot write cookies. Whether
-// the signed-in person is on the team list is checked by requireUser() in each page, not here.
+// the signed-in person is on the team list is checked by requireUser() in each page, not here. The
+// call recording links (/api/calls/*) are fetched by the player, not navigated to: signed out, they
+// get a 401 JSON answer the player understands instead of the login page.
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -30,6 +32,7 @@ export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   if (!signedIn && !isPublicPath(pathname)) {
+    if (pathname.startsWith("/api/calls/")) return withCookies(NextResponse.json({ error: "signed_out" }, { status: 401 }), response);
     const login = request.nextUrl.clone();
     login.pathname = "/login";
     login.search = pathname === "/" ? "" : `?next=${encodeURIComponent(pathname + search)}`;

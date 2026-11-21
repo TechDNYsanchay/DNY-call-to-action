@@ -11,8 +11,8 @@ const fail = (where: string, error: { message: string } | null): void => {
   if (error) throw new Error(`${where}: ${error.message}`);
 };
 
-/** Open-item counts and latest headline for a set of meetings, in two small queries. */
-async function decorate(meetings: MeetingSummary[]): Promise<InboxRow[]> {
+/** Open-item counts and latest headline for a set of meetings (or calls), in two small queries. Extra fields ride along. */
+export async function decorate<T extends MeetingSummary>(meetings: T[]): Promise<Array<T & Pick<InboxRow, "headline" | "counts">>> {
   if (!meetings.length) return [];
   const db = await supabaseServer();
   const ids = meetings.map((m) => m.id);
@@ -40,13 +40,16 @@ async function decorate(meetings: MeetingSummary[]): Promise<InboxRow[]> {
   return meetings.map((m) => ({ ...m, headline: headlines.get(m.id) ?? null, counts: counts.get(m.id) ?? { dny: 0, client: 0, decisions: 0 } }));
 }
 
-/** Meeting ids whose client name or latest headline matches the search, for the inbox .or() filter. */
+/**
+ * Meeting ids whose client name or latest headline matches the search, for the inbox .or() filter. Only
+ * meetings' sheets are read: a call's sheet would take one of the 200 places and push a meeting out.
+ */
 async function searchTargets(q: string): Promise<{ clientIds: string[]; meetingIds: string[] }> {
   const db = await supabaseServer();
   const pattern = ilikePattern(q);
   const [clients, sheets] = await Promise.all([
     db.from("clients").select("id").ilike("name", pattern).limit(50),
-    db.from("sheets").select("meeting_id").ilike("headline", pattern).eq("status", "ready").limit(200),
+    db.from("sheets").select("meeting_id, meeting:meetings!inner(kind)").ilike("headline", pattern).eq("status", "ready").eq("meeting.kind", "meeting").limit(200),
   ]);
   fail("clients", clients.error);
   fail("sheets", sheets.error);
@@ -63,7 +66,7 @@ export interface InboxPage {
 export async function listInbox(query: InboxQuery): Promise<InboxPage> {
   const db = await supabaseServer();
   const from = (query.page - 1) * PAGE_SIZE;
-  let req = db.from("meetings").select(MEETING_COLUMNS).order("happened_at", { ascending: false }).range(from, from + PAGE_SIZE);
+  let req = db.from("meetings").select(MEETING_COLUMNS).eq("kind", "meeting").order("happened_at", { ascending: false }).range(from, from + PAGE_SIZE);
   if (!query.showSkipped) req = req.neq("process_status", "skipped");
   if (query.filter === "clients") req = req.eq("type", "client");
   if (query.filter === "attention") req = req.in("process_status", ["needs_decision", "failed"]);
@@ -78,7 +81,7 @@ export async function listInbox(query: InboxQuery): Promise<InboxPage> {
   const pinnedReq =
     query.page === 1 && query.filter !== "attention" && !query.q
       ? (() => {
-          let p = db.from("meetings").select(MEETING_COLUMNS).in("process_status", ["needs_decision", "failed"]).order("happened_at", { ascending: false }).limit(30);
+          let p = db.from("meetings").select(MEETING_COLUMNS).eq("kind", "meeting").in("process_status", ["needs_decision", "failed"]).order("happened_at", { ascending: false }).limit(30);
           if (query.clientId) p = p.eq("client_id", query.clientId);
           if (query.filter === "clients") p = p.eq("type", "client");
           return p;
@@ -98,7 +101,7 @@ export async function listInbox(query: InboxQuery): Promise<InboxPage> {
 /** How many meetings wait for a person, for the nav badge. */
 export async function countNeedsDecision(): Promise<number> {
   const db = await supabaseServer();
-  const { count, error } = await db.from("meetings").select("id", { count: "exact", head: true }).eq("process_status", "needs_decision");
+  const { count, error } = await db.from("meetings").select("id", { count: "exact", head: true }).eq("kind", "meeting").eq("process_status", "needs_decision");
   fail("meetings", error);
   return count ?? 0;
 }
@@ -112,8 +115,8 @@ export async function listReviewQueue(): Promise<{ undecided: ReviewMeeting[]; s
   const db = await supabaseServer();
   const select = `${MEETING_COLUMNS}, participants(${PARTICIPANT_COLUMNS})` as const;
   const [undecided, sales] = await Promise.all([
-    db.from("meetings").select(select).eq("process_status", "needs_decision").order("happened_at", { ascending: false }).limit(100),
-    db.from("meetings").select(select).eq("type", "sales").eq("process_status", "skipped").order("happened_at", { ascending: false }).limit(30),
+    db.from("meetings").select(select).eq("kind", "meeting").eq("process_status", "needs_decision").order("happened_at", { ascending: false }).limit(100),
+    db.from("meetings").select(select).eq("kind", "meeting").eq("type", "sales").eq("process_status", "skipped").order("happened_at", { ascending: false }).limit(30),
   ]);
   fail("meetings", undecided.error);
   fail("meetings", sales.error);

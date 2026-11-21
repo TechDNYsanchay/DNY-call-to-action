@@ -1,7 +1,7 @@
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/require-user";
 import { listClientOptions } from "@/lib/data/clients";
 import { getMeetingHeader, getMeetingPage } from "@/lib/data/meetings";
@@ -47,6 +47,8 @@ export default async function MeetingPage({ params }: { params: Params }) {
   const { isAdmin } = await requireUser();
   const [data, people, clients, threshold] = await Promise.all([getMeetingPage(id), listActivePeople(), listClientOptions(), confidenceThreshold()]);
   if (!data) notFound();
+  // Old links and ERP links to a phone call land on its call page.
+  if (data.meeting.kind === "call") redirect(`/calls/${id}`);
   const { meeting, participants, sheet, items } = data;
   const timestampParam = optionalEnv("TLDV_TIMESTAMP_PARAM") ?? null;
   const attendees = attendeesOf(participants, meeting.type);

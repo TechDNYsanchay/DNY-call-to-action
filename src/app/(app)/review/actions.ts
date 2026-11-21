@@ -32,9 +32,11 @@ export async function decideMeetingType(meetingId: string, type: DecisionType, o
     const { person } = await requireUser();
     if (!TYPES.includes(type)) throw new Error("Unknown meeting type");
     const db = supabaseAdmin();
-    const { data: meeting, error } = await db.from("meetings").select("id, type, client_id, process_status, transcript_ready").eq("id", meetingId).maybeSingle();
+    const { data: meeting, error } = await db.from("meetings").select("id, kind, type, client_id, process_status, transcript_ready").eq("id", meetingId).maybeSingle();
     if (error) throw new Error(error.message);
     if (!meeting) throw new Error("This meeting no longer exists");
+    // A phone call is decided on its call page, where its own rules (the line's people, deletion) apply.
+    if (meeting.kind === "call") throw new Error("This is a phone call. Use the call page");
 
     let clientId: string | null = meeting.client_id;
     if (type === "client") {

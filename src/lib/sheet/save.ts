@@ -1,10 +1,16 @@
 import "server-only";
+import { callsDb } from "@/lib/calls/db";
+import { pgErrorText } from "@/lib/calls/sanitize";
+import { refineEvidenceSeconds } from "@/lib/calls/seek";
 import { istDate, secondsFrom } from "@/lib/format";
-import type { Database } from "@/lib/supabase/database.types";
+import { isEligibleType } from "@/lib/ingest/decisions";
+import type { Database, Json } from "@/lib/supabase/database.types";
 import { supabaseAdmin } from "@/lib/supabase/server";
-import { loadMeetingContext, type MeetingContext } from "./load";
+import { CALL_PURGED, CLAIM_GONE, checkCallClaim } from "./claim";
+import { loadMeetingContext, type MeetingContext, meetingKindOf } from "./load";
 import { matchItems, type ExistingItem } from "./match-items";
-import { type ActionItem, PROMPT_VERSION, SheetSchema } from "./schema";
+import { type ActionItem, PROMPT_VERSION, SheetSchema, sheetSchemaFor } from "./schema";
+import { buildCallSaveArgs, callParticipantNames } from "./save-call";
 import { logAgentRun, logPipelineEvent } from "./settings";
 import { countsOf, type SheetCounts, splitModel } from "./sheet-body";
 import { bestMatch } from "./text";
@@ -25,13 +31,21 @@ export interface SheetVerification {
   warnings: string[];
   evidence_verified: Record<string, boolean>;
   adjusted_confidence: Record<string, number>;
+  /** Calls only: the second each quote is said, by entry id (refined at save, src/lib/calls/seek.ts). */
+  evidence_seconds?: Record<string, number[]>;
 }
 
+/** A meeting's checks exactly as before; a call's take one to three summary bullets and also know the line's people and the saved contact name. */
 export const checkContextOf = (ctx: MeetingContext): CheckContext => ({
+  ...(ctx.call ? { kind: "call" as const } : {}),
   turns: ctx.turns,
   durationSec: ctx.meeting.duration_sec,
   meetingDateIst: istDate(ctx.meeting.happened_at),
-  participantNames: [...ctx.participants.map((p) => p.name).filter((n): n is string => !!n), ...ctx.roster.map((r) => r.full_name)],
+  participantNames: [
+    ...ctx.participants.map((p) => p.name).filter((n): n is string => !!n),
+    ...ctx.roster.map((r) => r.full_name),
+    ...(ctx.call ? callParticipantNames(ctx.call) : []),
+  ],
   speakerLabels: [...new Set(ctx.turns.map((t) => t.speaker))],
 });
 
@@ -75,8 +89,14 @@ function itemRow(item: ActionItem, key: string, position: number, existing: Acti
 /**
  * Validate a sheet against the schema and the transcript, then store it as a new version with its
  * action items. With dryRun nothing is written; the routine uses that to fix its errors first.
+ * A phone call goes to saveCallSheet; anything else (an unknown id too) is a meeting, exactly as before.
  */
-export async function saveSheet(meetingId: string, json: unknown, { dryRun }: { dryRun: boolean }): Promise<SaveOutcome> {
+export async function saveSheet(meetingId: string, json: unknown, { dryRun, claim = null }: { dryRun: boolean; claim?: string | null }): Promise<SaveOutcome & { httpStatus?: number }> {
+  if ((await meetingKindOf(meetingId)) === "call") return saveCallSheet(meetingId, json, { dryRun, claim });
+  return saveMeetingSheet(meetingId, json, { dryRun });
+}
+
+async function saveMeetingSheet(meetingId: string, json: unknown, { dryRun }: { dryRun: boolean }): Promise<SaveOutcome> {
   const { sheet: raw, model } = splitModel(json);
   const parsed = SheetSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, errors: zodIssues(parsed.error), warnings: [] };
@@ -170,6 +190,75 @@ export async function saveSheet(meetingId: string, json: unknown, { dryRun }: { 
   }
 
   const summary = `Sheet v${version} saved: ${counts.dny} for DNY, ${counts.client} for the client, ${counts.decisions} decisions` + (outcome.keptIds.length ? `; ${outcome.keptIds.length} edited items kept` : "");
+  await logAgentRun(meetingId, "extract", "ok", attempt, summary, check.warnings.length ? { warnings: check.warnings } : undefined);
+  await logPipelineEvent(meetingId, "info", "extract", summary);
+  return { ok: true, saved: true, version, headline: sheet.headline, counts, warnings: check.warnings };
+}
+
+const CLASSIFY_FIRST = "Classify the call first (POST /classify)";
+
+/** save_call_sheet's refusals: the claim is gone or the call was deleted (409), or it is not ready for a sheet (422). */
+function callSaveRefusal(message: string): { httpStatus: 409 | 422; error: string } | null {
+  if (message === "claim_mismatch") return { httpStatus: 409, error: CLAIM_GONE };
+  if (message === "call_purged") return { httpStatus: 409, error: CALL_PURGED };
+  if (message === "call_not_business") return { httpStatus: 422, error: CLASSIFY_FIRST };
+  if (message === "call_not_found") return { httpStatus: 422, error: "Meeting not found" };
+  const status = /^call_not_processing:(\w+)$/.exec(message)?.[1];
+  return status ? { httpStatus: 422, error: `Call is ${status}, not processing; call next to claim it` } : null;
+}
+
+/**
+ * A client or vendor call's sheet: the call schema (one to three summary bullets), the routine's claim (a dry
+ * run needs none), the same checks against the transcript, and one save_call_sheet transaction that writes the
+ * sheet and its items only while that claim is current and the call is business and not deleted.
+ */
+async function saveCallSheet(meetingId: string, json: unknown, { dryRun, claim }: { dryRun: boolean; claim: string | null }): Promise<SaveOutcome & { httpStatus?: number }> {
+  const { sheet: raw, model } = splitModel(json);
+  const ctx = await loadMeetingContext(meetingId);
+  if (!ctx) return { ok: false, errors: ["Meeting not found"], warnings: [] };
+  const parsed = sheetSchemaFor("call").safeParse(raw);
+  if (!parsed.success) return { ok: false, errors: zodIssues(parsed.error), warnings: [] };
+  const sheet = parsed.data;
+  const refusal = checkCallClaim(ctx.meeting, claim, { dryRun });
+  if (refusal) return { ok: false, errors: [refusal.error], warnings: [], httpStatus: refusal.httpStatus };
+  if (ctx.call?.purgedAt) return { ok: false, errors: [CALL_PURGED], warnings: [], httpStatus: 409 };
+  if (!isEligibleType("call", ctx.meeting.type)) return { ok: false, errors: [CLASSIFY_FIRST], warnings: [] };
+  if (!ctx.turns.length) return { ok: false, errors: ["No transcript is stored for this call; release it and move on"], warnings: [] };
+  const attempt = ctx.meeting.process_attempts;
+
+  const check = checkSheet(sheet, checkContextOf(ctx));
+  if (check.errors.length) {
+    if (!dryRun) await logAgentRun(meetingId, "extract", "rejected", attempt, `Sheet rejected: ${check.errors.length} errors`, { errors: check.errors, warnings: check.warnings });
+    return { ok: false, errors: check.errors, warnings: check.warnings };
+  }
+  const counts = countsOf(sheet);
+  if (dryRun) return { ok: true, saved: false, version: null, headline: sheet.headline, counts, warnings: check.warnings };
+
+  const { data: existingRows, error: existingError } = await supabaseAdmin().from("action_items").select("*").eq("meeting_id", meetingId);
+  if (existingError) return { ok: false, errors: [existingError.message], warnings: check.warnings };
+  const args = buildCallSaveArgs({ sheet, existing: existingRows ?? [], check, refined: refineEvidenceSeconds(sheet, ctx.turns), roster: ctx.roster, now: new Date() });
+  // One transaction, and never retried: a reply lost on the way back cannot write the sheet twice.
+  const { data: version, error } = await callsDb().rpc("save_call_sheet", {
+    p_meeting_id: meetingId,
+    p_claim: claim as string,
+    p_headline: sheet.headline,
+    p_result: { ...sheet, verification: args.verification } as unknown as Json,
+    p_model: model as string,
+    p_prompt_version: PROMPT_VERSION,
+    p_items: args.p_items,
+    p_reused: args.p_reused,
+    p_superseded: args.p_superseded,
+  });
+  if (error) {
+    const refused = callSaveRefusal(error.message);
+    if (refused) return { ok: false, errors: [refused.error], warnings: check.warnings, httpStatus: refused.httpStatus };
+    const text = pgErrorText(error);
+    await logAgentRun(meetingId, "extract", "error", attempt, `Could not store the sheet: ${text}`);
+    return { ok: false, errors: [`Could not store the sheet: ${text}. Nothing was saved; try again.`], warnings: check.warnings };
+  }
+
+  const otherSide = ctx.meeting.type === "vendor" ? "the vendor" : "the client";
+  const summary = `Sheet v${version} saved: ${counts.dny} for DNY, ${counts.client} for ${otherSide}, ${counts.decisions} decisions` + (args.kept ? `; ${args.kept} edited items kept` : "");
   await logAgentRun(meetingId, "extract", "ok", attempt, summary, check.warnings.length ? { warnings: check.warnings } : undefined);
   await logPipelineEvent(meetingId, "info", "extract", summary);
   return { ok: true, saved: true, version, headline: sheet.headline, counts, warnings: check.warnings };

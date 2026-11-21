@@ -1,0 +1,400 @@
+{
+  "metadata": {
+    "transaction_key": "deprecated",
+    "request_id": "5f0c1f8e-2b1d-4c51-9a7e-3d2f6b8a9c10",
+    "sha256": "ae92f0897586d0394a8af7545ea6b616112f0685c7baaf9e681fb0657ab69053",
+    "created": "2026-11-19T08:40:12.511Z",
+    "duration": 147.2,
+    "channels": 1,
+    "models": [
+      "2187e11a-3532-4498-b076-81fa530bdd49"
+    ],
+    "model_info": {
+      "2187e11a-3532-4498-b076-81fa530bdd49": {
+        "name": "general-nova-3",
+        "version": "2025-07-31.0",
+        "arch": "nova-3"
+      }
+    }
+  },
+  "results": {
+    "channels": [
+      {
+        "alternatives": [
+          {
+            "transcript": "Hello Rakesh ji, main Ashwini bol rahi hoon DNY se. हाँ Ashwini ji, बोलिए। Revised menu costing main Friday tak bhej dungi. ठीक है, aur vendor bills main kal share kar dunga. Perfect, thank you. Agle hafte call karte hain.",
+            "confidence": 0.91,
+            "words": [
+              {
+                "word": "hello",
+                "start": 0.8,
+                "end": 1.16,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "Hello"
+              },
+              {
+                "word": "rakesh",
+                "start": 1.22,
+                "end": 1.58,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "Rakesh"
+              },
+              {
+                "word": "ji",
+                "start": 1.64,
+                "end": 2,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "ji,"
+              },
+              {
+                "word": "main",
+                "start": 2.06,
+                "end": 2.42,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "main"
+              },
+              {
+                "word": "ashwini",
+                "start": 2.48,
+                "end": 2.84,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "Ashwini"
+              },
+              {
+                "word": "bol",
+                "start": 2.9,
+                "end": 3.26,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "bol"
+              },
+              {
+                "word": "rahi",
+                "start": 3.32,
+                "end": 3.68,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "rahi"
+              },
+              {
+                "word": "hoon",
+                "start": 3.74,
+                "end": 4.1,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "hoon"
+              },
+              {
+                "word": "dny",
+                "start": 4.16,
+                "end": 4.52,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "DNY"
+              },
+              {
+                "word": "se",
+                "start": 4.58,
+                "end": 4.94,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "se."
+              },
+              {
+                "word": "हाँ",
+                "start": 5.6,
+                "end": 5.96,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "हाँ"
+              },
+              {
+                "word": "ashwini",
+                "start": 6.02,
+                "end": 6.38,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "Ashwini"
+              },
+              {
+                "word": "ji",
+                "start": 6.44,
+                "end": 6.8,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "ji,"
+              },
+              {
+                "word": "बोलिए",
+                "start": 6.86,
+                "end": 7.22,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "बोलिए।"
+              },
+              {
+                "word": "revised",
+                "start": 8.9,
+                "end": 9.26,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "Revised"
+              },
+              {
+                "word": "menu",
+                "start": 9.32,
+                "end": 9.68,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "menu"
+              },
+              {
+                "word": "costing",
+                "start": 9.74,
+                "end": 10.1,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "costing"
+              },
+              {
+                "word": "main",
+                "start": 10.16,
+                "end": 10.52,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "main"
+              },
+              {
+                "word": "friday",
+                "start": 10.58,
+                "end": 10.94,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "Friday"
+              },
+              {
+                "word": "tak",
+                "start": 11,
+                "end": 11.36,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "tak"
+              },
+              {
+                "word": "bhej",
+                "start": 11.42,
+                "end": 11.78,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "bhej"
+              },
+              {
+                "word": "dungi",
+                "start": 11.84,
+                "end": 12.2,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "dungi."
+              },
+              {
+                "word": "ठीक",
+                "start": 14.2,
+                "end": 14.56,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "ठीक"
+              },
+              {
+                "word": "है",
+                "start": 14.62,
+                "end": 14.98,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "है,"
+              },
+              {
+                "word": "aur",
+                "start": 15.04,
+                "end": 15.4,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "aur"
+              },
+              {
+                "word": "vendor",
+                "start": 15.46,
+                "end": 15.82,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "vendor"
+              },
+              {
+                "word": "bills",
+                "start": 15.88,
+                "end": 16.24,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "bills"
+              },
+              {
+                "word": "main",
+                "start": 16.3,
+                "end": 16.66,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "main"
+              },
+              {
+                "word": "kal",
+                "start": 16.72,
+                "end": 17.08,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "kal"
+              },
+              {
+                "word": "share",
+                "start": 17.14,
+                "end": 17.5,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "share"
+              },
+              {
+                "word": "kar",
+                "start": 17.56,
+                "end": 17.92,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "kar"
+              },
+              {
+                "word": "dunga",
+                "start": 17.98,
+                "end": 18.34,
+                "confidence": 0.93,
+                "speaker": 0,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "dunga."
+              },
+              {
+                "word": "perfect",
+                "start": 138,
+                "end": 138.36,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "Perfect,"
+              },
+              {
+                "word": "thank",
+                "start": 138.42,
+                "end": 138.78,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "thank"
+              },
+              {
+                "word": "you",
+                "start": 138.84,
+                "end": 139.2,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "you."
+              },
+              {
+                "word": "agle",
+                "start": 139.26,
+                "end": 139.62,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "Agle"
+              },
+              {
+                "word": "hafte",
+                "start": 139.68,
+                "end": 140.04,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "hafte"
+              },
+              {
+                "word": "call",
+                "start": 140.1,
+                "end": 140.46,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "call"
+              },
+              {
+                "word": "karte",
+                "start": 140.52,
+                "end": 140.88,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "karte"
+              },
+              {
+                "word": "hain",
+                "start": 140.94,
+                "end": 141.3,
+                "confidence": 0.93,
+                "speaker": 1,
+                "speaker_confidence": 0.71,
+                "punctuated_word": "hain."
+              }
+            ],
+            "languages": [
+              "hi",
+              "en"
+            ]
+          }
+        ],
+        "detected_language": "hi",
+        "language_confidence": 0.82
+      }
+    ]
+  }
+}

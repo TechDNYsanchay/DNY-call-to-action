@@ -3,6 +3,7 @@ import { CalendarBlank, Question } from "@phosphor-icons/react/dist/ssr";
 import type { Evidence } from "@/lib/sheet/schema";
 import { formatShortDate, relativeDue, secondsFrom } from "@/lib/format";
 import { recordingUrl } from "@/lib/ui/evidence";
+import type { OtherSide } from "@/lib/ui/lanes";
 import { evidenceVerified, PURPOSE_WORDS, SENTIMENT_WORDS, type SheetView } from "@/lib/ui/sheet-result";
 import { Chip, SectionLabel } from "@/components/ui/chip";
 import { QuietLine } from "@/components/ui/states";
@@ -10,24 +11,38 @@ import { EvidencePill } from "./evidence";
 import { EvidenceQuote } from "./evidence-quote";
 
 // The sections below the lanes, in fixed order: decisions, facts, risks, open questions, next
-// meeting, client sentiment. Server components; only the evidence pill is interactive.
+// meeting, client sentiment. Server components; only the evidence pill is interactive. A phone call's
+// sheet passes the other side (a vendor call says "by vendor"), the speakers' mapped names, the second each
+// quote is said, and `seekable` when its recording can play; meeting pages pass none of these.
 
 export interface EvidenceContext {
   tldvUrl: string | null;
   timestampParam: string | null;
+  otherSide?: OtherSide;
+  /** The recording can play on this page: quote timestamps become play buttons. */
+  seekable?: boolean;
+  /** verification.evidence_seconds: the second each entry's quotes are said, by entry id. */
+  refined?: Record<string, number[]>;
+  /** "Speaker 1" -> "Rakesh (client)", from the sheet's participants. */
+  speakerNames?: Record<string, string>;
 }
+
+/** "client" unless a vendor call's sheet says otherwise. */
+const otherWord = (ctx: EvidenceContext): string => ctx.otherSide?.word ?? "client";
 
 /** Pill + hidden inline quote for one entry's first quote. */
 function EntryEvidence({ evidence, id, view, ctx }: { evidence: Evidence[]; id: string; view: SheetView; ctx: EvidenceContext }) {
   const first = evidence[0];
   if (!first) return null;
-  const seconds = secondsFrom(first.timestamp);
+  const refinedSec = ctx.refined?.[id]?.[0] ?? null;
+  const seconds = refinedSec ?? secondsFrom(first.timestamp);
+  const speaker = ctx.speakerNames?.[first.speaker] ?? first.speaker;
   const verified = evidenceVerified(view, id);
   return (
     <>
-      <EvidencePill seconds={seconds} speaker={first.speaker} quote={first.quote} quoteEnglish={first.quote_english} recordingHref={recordingUrl(ctx.tldvUrl, seconds, ctx.timestampParam)} verified={verified} more={evidence.length - 1} />
+      <EvidencePill seconds={seconds} speaker={speaker} quote={first.quote} quoteEnglish={first.quote_english} recordingHref={recordingUrl(ctx.tldvUrl, seconds, ctx.timestampParam)} verified={verified} more={evidence.length - 1} refinedSec={refinedSec} />
       <div className="evidence-inline basis-full pt-1">
-        <EvidenceQuote seconds={seconds} speaker={first.speaker} quote={first.quote} quoteEnglish={first.quote_english} verified={verified} />
+        <EvidenceQuote seconds={seconds} speaker={speaker} quote={first.quote} quoteEnglish={first.quote_english} verified={verified} seekable={ctx.seekable} refinedSec={refinedSec} />
       </div>
     </>
   );
@@ -67,7 +82,7 @@ export function DecisionList({ view, ctx }: { view: SheetView; ctx: EvidenceCont
           <span className="w-5 shrink-0 pt-px font-mono text-[12px] text-ink-3 tnum">{i + 1}</span>
           <p className="min-w-0 flex-1 text-[15px] leading-[22px] text-ink lg:text-[14px] lg:leading-[20px]">
             {d.statement}
-            {d.decided_by !== "unclear" && <span className="ml-1.5 text-[12px] text-ink-3">{d.decided_by === "joint" ? "joint" : d.decided_by === "dny" ? "by DNY" : "by client"}</span>}
+            {d.decided_by !== "unclear" && <span className="ml-1.5 text-[12px] text-ink-3">{d.decided_by === "joint" ? "joint" : d.decided_by === "dny" ? "by DNY" : `by ${otherWord(ctx)}`}</span>}
           </p>
           <EntryEvidence evidence={d.evidence} id={d.id} view={view} ctx={ctx} />
         </li>
@@ -106,7 +121,7 @@ export function RiskList({ view, ctx }: { view: SheetView; ctx: EvidenceContext 
             <p className="text-[15px] leading-[22px] text-ink lg:text-[14px] lg:leading-[20px]">{r.description}</p>
             <p className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-ink-3">
               <span className={r.severity === "high" ? "font-medium text-signal" : ""}>{r.severity} severity</span>
-              <span>· affects {r.affects === "both" ? "both sides" : r.affects === "unclear" ? "unclear" : r.affects === "dny" ? "DNY" : "the client"}</span>
+              <span>· affects {r.affects === "both" ? "both sides" : r.affects === "unclear" ? "unclear" : r.affects === "dny" ? "DNY" : `the ${otherWord(ctx)}`}</span>
             </p>
             {r.mitigation_discussed && <p className="mt-1 text-[13px] leading-[18px] text-ink-2">Discussed: {r.mitigation_discussed}</p>}
           </div>
@@ -126,7 +141,7 @@ export function QuestionList({ view, ctx }: { view: SheetView; ctx: EvidenceCont
           <Question size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-slate" />
           <p className="min-w-0 flex-1 text-[15px] leading-[22px] text-ink lg:text-[14px] lg:leading-[20px]">
             {q.question}
-            {q.needs_answer_from !== "unclear" && <span className="ml-1.5 text-[12px] text-slate">{q.needs_answer_from === "dny" ? "DNY to answer" : "client to answer"}</span>}
+            {q.needs_answer_from !== "unclear" && <span className="ml-1.5 text-[12px] text-slate">{q.needs_answer_from === "dny" ? "DNY to answer" : `${otherWord(ctx)} to answer`}</span>}
           </p>
           <EntryEvidence evidence={q.evidence} id={q.id} view={view} ctx={ctx} />
         </li>

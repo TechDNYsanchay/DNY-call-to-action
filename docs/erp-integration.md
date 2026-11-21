@@ -321,6 +321,12 @@ the decision line, then shorten details. The last line always stays so an ERP us
 The ERP has no link column on CTAs (links exist on tasks only: `task_links`, `0021`), so the URL lives in
 the text. **Inferred format**; the ERP shows `observation` under the CTA on `/ctas` and the meeting page.
 
+Phone calls (`meetings.kind = 'call'`, added 2026-11) have no tl;dv link: their Recording line is the app's call
+page, `<NEXT_PUBLIC_SITE_URL>/calls/<meetings.id>` (with `?t=<evidence_ts_sec>` to play from the quote), and the
+last line says `call "<meetings.title>"`. A vendor call (`type = 'vendor'`) has no client (`client_id` null), so its
+items have no ERP client or project; its `owed_by: client` items are owed by the vendor and, like any
+client-owed item, are not pushed.
+
 ### 3.6 Idempotency
 
 - `source = 'call-to-action'`, `source_ref = action_items.id`. Our `id` is stable across sheet re-runs

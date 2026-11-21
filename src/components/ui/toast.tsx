@@ -4,7 +4,8 @@ import clsx from "clsx";
 import { createContext, type ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
 
 // A small toast queue: role=status, slides 8 px up, 6 s with an optional undo. One provider in the
-// shell; any client component calls useToast().
+// shell; any client component calls useToast(). Toasts sit above the phone tab bar and above a call's
+// mini-player (--dock-h, 0 when there is none).
 
 export interface ToastInput {
   message: string;
@@ -42,7 +43,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext value={value}>
       {children}
-      <div className="pointer-events-none fixed inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom,0px))] z-[60] flex flex-col items-center gap-2 px-4 md:bottom-6">
+      <div className="pointer-events-none fixed inset-x-0 bottom-[calc(64px+var(--dock-h,0px)+env(safe-area-inset-bottom,0px))] z-[60] flex flex-col items-center gap-2 px-4 md:bottom-[calc(1.5rem+var(--dock-h,0px))]">
         {toasts.map((t) => (
           <div
             key={t.id}

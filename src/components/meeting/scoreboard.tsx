@@ -1,8 +1,10 @@
 import clsx from "clsx";
+import type { OtherSide } from "@/lib/ui/lanes";
 
 // Three large mono numerals: for DNY (bottle), for client (sienna), decisions (ink), plus a small
 // red risks tag when there are any. Each is a link that scrolls to its section. Numerals never
-// count up. Phone: a horizontally scrolling strip of three 112 px chips.
+// count up. Phone: a horizontally scrolling strip of three 112 px chips. A vendor call's sheet says
+// "for vendor" (otherSide); meeting pages pass nothing.
 
 export interface ScoreboardProps {
   dny: number;
@@ -12,12 +14,13 @@ export interface ScoreboardProps {
   /** Every DNY-owed row done: the first numeral turns green with a check. */
   dnyComplete?: boolean;
   className?: string;
+  otherSide?: OtherSide;
 }
 
-export function Scoreboard({ dny, client, decisions, risks, dnyComplete, className }: ScoreboardProps) {
+export function Scoreboard({ dny, client, decisions, risks, dnyComplete, className, otherSide }: ScoreboardProps) {
   const cells = [
     { href: "#lane-dny", value: dny, label: "for DNY", tone: dnyComplete ? "text-bottle" : dny ? "text-bottle" : "text-ink-3", done: dnyComplete },
-    { href: "#lane-client", value: client, label: "for client", tone: client ? "text-sienna" : "text-ink-3" },
+    { href: "#lane-client", value: client, label: `for ${otherSide?.word ?? "client"}`, tone: client ? "text-sienna" : "text-ink-3" },
     { href: "#decisions", value: decisions, label: "decisions", tone: decisions ? "text-ink" : "text-ink-3" },
   ];
   return (

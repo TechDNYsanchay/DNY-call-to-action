@@ -1,7 +1,10 @@
-// The sheet: the JSON the routine returns for one client meeting. The server validates against this
-// (zod) and publishes the JSON Schema in the work package so the routine copies the exact shape.
+// The sheet: the JSON the routine returns for one client meeting or one client or vendor call. The server
+// validates against this (zod) and publishes the JSON Schema in the work package so the routine copies the
+// exact shape. A call's sheet is the meeting sheet with one to three summary bullets; in a vendor call's sheet
+// the "client" side means the vendor.
 
 import { z } from "zod";
+import type { ConversationKind } from "@/lib/ingest/decisions";
 
 const confidence = z.number().min(0).max(1);
 
@@ -173,9 +176,42 @@ export const ClassificationSchema = z
 
 export type Classification = z.infer<typeof ClassificationSchema>;
 
+/** The types the routine may give a phone call; only client and vendor calls get a sheet. */
+export const CALL_CLASS_TYPES = ["client", "vendor", "sales", "internal", "personal", "wrong_number", "no_content"] as const;
+export type CallClassType = (typeof CALL_CLASS_TYPES)[number];
+
+/** The routine's answer for a phone call. Nothing it writes about a call that is not a work call is stored. */
+export const CallClassificationSchema = z
+  .object({
+    type: z
+      .enum(CALL_CLASS_TYPES)
+      .describe(
+        "client = DNY serves this party; vendor = a supplier or service provider DNY or a DNY-run outlet buys from; sales = a prospect DNY is trying to win; internal = DNY colleagues; personal = a private call; wrong_number = the caller wanted someone else; no_content = no real conversation (IVR, voicemail, hold music, garbled)",
+      ),
+    confidence: confidence.describe("Honest: below classification.threshold when you are not sure; a person then decides"),
+    reason: z.string().min(3).max(400).describe("Business calls: one plain sentence. Others: a short category phrase only, e.g. 'Personal call'; never describe the conversation"),
+    evidence: z.array(EvidenceSchema).max(3),
+    client_name_guess: z
+      .string()
+      .nullable()
+      .describe("Client calls: the exact call.knownClients entry when it matches, else the business name said, else null. Vendor calls: the vendor's business name if said, else null"),
+    language: z.enum(["english", "hindi", "hinglish", "other"]),
+  })
+  .strict();
+
+export type CallClassification = z.infer<typeof CallClassificationSchema>;
+
+/** A call's sheet: the meeting sheet with one to three summary bullets. */
+export const CallSheetSchema = SheetSchema.extend({
+  executive_summary: z.array(z.string().min(3).max(300)).min(1).max(3).describe("One to three bullets; a two-minute call usually needs one or two"),
+}).strict();
+
+export const sheetSchemaFor = (kind: ConversationKind) => (kind === "call" ? CallSheetSchema : SheetSchema);
+
 /** Bumped whenever the guide, the schema or the checks change; stored on every sheet. */
-export const PROMPT_VERSION = "1.0.0";
+export const PROMPT_VERSION = "1.1.0";
 
 /** JSON Schema for the work package, so the routine sees the exact shape it must return. */
-export const sheetJsonSchema = () => z.toJSONSchema(SheetSchema, { target: "draft-7" });
+export const sheetJsonSchema = (kind: ConversationKind = "meeting") => z.toJSONSchema(sheetSchemaFor(kind), { target: "draft-7" });
 export const classificationJsonSchema = () => z.toJSONSchema(ClassificationSchema, { target: "draft-7" });
+export const callClassificationJsonSchema = () => z.toJSONSchema(CallClassificationSchema, { target: "draft-7" });

@@ -208,6 +208,189 @@ export type Database = {
           },
         ]
       }
+      call_log: {
+        Row: {
+          attempts: number
+          bytes: number | null
+          call_started_at: string
+          callyzer_id: string
+          counterpart_e164: string | null
+          counterpart_masked: string
+          counterpart_name: string | null
+          direction: string
+          duration_sec: number
+          error: string | null
+          error_kind: string | null
+          first_error_at: string | null
+          first_seen_at: string
+          line_id: string
+          meeting_id: string | null
+          next_try_at: string | null
+          recording_seen_at: string | null
+          recording_url: string | null
+          started_at: string | null
+          status: string
+          storage_path: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          bytes?: number | null
+          call_started_at: string
+          callyzer_id: string
+          counterpart_e164?: string | null
+          counterpart_masked: string
+          counterpart_name?: string | null
+          direction: string
+          duration_sec: number
+          error?: string | null
+          error_kind?: string | null
+          first_error_at?: string | null
+          first_seen_at?: string
+          line_id: string
+          meeting_id?: string | null
+          next_try_at?: string | null
+          recording_seen_at?: string | null
+          recording_url?: string | null
+          started_at?: string | null
+          status?: string
+          storage_path?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          bytes?: number | null
+          call_started_at?: string
+          callyzer_id?: string
+          counterpart_e164?: string | null
+          counterpart_masked?: string
+          counterpart_name?: string | null
+          direction?: string
+          duration_sec?: number
+          error?: string | null
+          error_kind?: string | null
+          first_error_at?: string | null
+          first_seen_at?: string
+          line_id?: string
+          meeting_id?: string | null
+          next_try_at?: string | null
+          recording_seen_at?: string | null
+          recording_url?: string | null
+          started_at?: string | null
+          status?: string
+          storage_path?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_log_line_id_fkey"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "phone_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "call_log_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      call_reread_requests: {
+        Row: {
+          day: string
+          done_at: string | null
+          requested_at: string
+          requested_by: string | null
+        }
+        Insert: {
+          day: string
+          done_at?: string | null
+          requested_at?: string
+          requested_by?: string | null
+        }
+        Update: {
+          day?: string
+          done_at?: string | null
+          requested_at?: string
+          requested_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_reread_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      call_stt_usage: {
+        Row: {
+          created_at: string
+          id: number
+          meeting_id: string | null
+          outcome: string
+          reserved_sec: number
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          meeting_id?: string | null
+          outcome?: string
+          reserved_sec: number
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          meeting_id?: string | null
+          outcome?: string
+          reserved_sec?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_stt_usage_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      call_transcripts: {
+        Row: {
+          fetched_at: string
+          meeting_id: string
+          sentence_count: number
+          turns: Json
+          word_count: number
+        }
+        Insert: {
+          fetched_at?: string
+          meeting_id: string
+          sentence_count?: number
+          turns: Json
+          word_count?: number
+        }
+        Update: {
+          fetched_at?: string
+          meeting_id?: string
+          sentence_count?: number
+          turns?: Json
+          word_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_transcripts_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: true
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classification_feedback: {
         Row: {
           client_id: string | null
@@ -460,6 +643,8 @@ export type Database = {
       }
       meetings: {
         Row: {
+          callyzer_call_id: string | null
+          claim_token: string | null
           claimed_at: string | null
           client_id: string | null
           client_name_guess: string | null
@@ -468,6 +653,7 @@ export type Database = {
           failure_reason: string | null
           happened_at: string
           id: string
+          kind: string
           meet_code: string | null
           organizer_email: string | null
           organizer_name: string | null
@@ -476,7 +662,7 @@ export type Database = {
           raw: Json | null
           source: string
           title: string | null
-          tldv_meeting_id: string
+          tldv_meeting_id: string | null
           tldv_url: string | null
           transcript_ready: boolean
           type: Database["public"]["Enums"]["meeting_type"]
@@ -486,6 +672,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          callyzer_call_id?: string | null
+          claim_token?: string | null
           claimed_at?: string | null
           client_id?: string | null
           client_name_guess?: string | null
@@ -494,6 +682,7 @@ export type Database = {
           failure_reason?: string | null
           happened_at: string
           id?: string
+          kind?: string
           meet_code?: string | null
           organizer_email?: string | null
           organizer_name?: string | null
@@ -502,7 +691,7 @@ export type Database = {
           raw?: Json | null
           source?: string
           title?: string | null
-          tldv_meeting_id: string
+          tldv_meeting_id?: string | null
           tldv_url?: string | null
           transcript_ready?: boolean
           type?: Database["public"]["Enums"]["meeting_type"]
@@ -512,6 +701,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          callyzer_call_id?: string | null
+          claim_token?: string | null
           claimed_at?: string | null
           client_id?: string | null
           client_name_guess?: string | null
@@ -520,6 +711,7 @@ export type Database = {
           failure_reason?: string | null
           happened_at?: string
           id?: string
+          kind?: string
           meet_code?: string | null
           organizer_email?: string | null
           organizer_name?: string | null
@@ -528,7 +720,7 @@ export type Database = {
           raw?: Json | null
           source?: string
           title?: string | null
-          tldv_meeting_id?: string
+          tldv_meeting_id?: string | null
           tldv_url?: string | null
           transcript_ready?: boolean
           type?: Database["public"]["Enums"]["meeting_type"]
@@ -668,6 +860,224 @@ export type Database = {
         }
         Relationships: []
       }
+      phone_calls: {
+        Row: {
+          call_ended_at: string
+          callyzer_call_id: string
+          counterpart_masked: string
+          counterpart_name: string | null
+          created_at: string
+          decision_reason: string | null
+          decision_since: string | null
+          direction: string
+          first_claimed_at: string | null
+          first_sheet_at: string | null
+          line_id: string
+          media_deleted_at: string | null
+          meeting_id: string
+          purged_at: string | null
+          purged_by: string | null
+          ready_at: string | null
+          recording_bytes: number | null
+          recording_duration_sec: number | null
+          recording_mime: string | null
+          recording_path: string | null
+          recording_playable: boolean
+          recording_seen_at: string | null
+          recording_status: string
+          seen_at: string
+          skip_code: string | null
+          speaker_count: number | null
+          stored_at: string
+          stt_attempts: number
+          stt_audio_sec: number | null
+          stt_error: string | null
+          stt_error_kind: string | null
+          stt_first_error_at: string | null
+          stt_next_try_at: string | null
+          stt_provider: string | null
+          stt_started_at: string | null
+          stt_status: string
+          transcribed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          call_ended_at: string
+          callyzer_call_id: string
+          counterpart_masked: string
+          counterpart_name?: string | null
+          created_at?: string
+          decision_reason?: string | null
+          decision_since?: string | null
+          direction: string
+          first_claimed_at?: string | null
+          first_sheet_at?: string | null
+          line_id: string
+          media_deleted_at?: string | null
+          meeting_id: string
+          purged_at?: string | null
+          purged_by?: string | null
+          ready_at?: string | null
+          recording_bytes?: number | null
+          recording_duration_sec?: number | null
+          recording_mime?: string | null
+          recording_path?: string | null
+          recording_playable?: boolean
+          recording_seen_at?: string | null
+          recording_status?: string
+          seen_at: string
+          skip_code?: string | null
+          speaker_count?: number | null
+          stored_at?: string
+          stt_attempts?: number
+          stt_audio_sec?: number | null
+          stt_error?: string | null
+          stt_error_kind?: string | null
+          stt_first_error_at?: string | null
+          stt_next_try_at?: string | null
+          stt_provider?: string | null
+          stt_started_at?: string | null
+          stt_status?: string
+          transcribed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          call_ended_at?: string
+          callyzer_call_id?: string
+          counterpart_masked?: string
+          counterpart_name?: string | null
+          created_at?: string
+          decision_reason?: string | null
+          decision_since?: string | null
+          direction?: string
+          first_claimed_at?: string | null
+          first_sheet_at?: string | null
+          line_id?: string
+          media_deleted_at?: string | null
+          meeting_id?: string
+          purged_at?: string | null
+          purged_by?: string | null
+          ready_at?: string | null
+          recording_bytes?: number | null
+          recording_duration_sec?: number | null
+          recording_mime?: string | null
+          recording_path?: string | null
+          recording_playable?: boolean
+          recording_seen_at?: string | null
+          recording_status?: string
+          seen_at?: string
+          skip_code?: string | null
+          speaker_count?: number | null
+          stored_at?: string
+          stt_attempts?: number
+          stt_audio_sec?: number | null
+          stt_error?: string | null
+          stt_error_kind?: string | null
+          stt_first_error_at?: string | null
+          stt_next_try_at?: string | null
+          stt_provider?: string | null
+          stt_started_at?: string | null
+          stt_status?: string
+          transcribed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "phone_calls_line_id_fkey"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "phone_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "phone_calls_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: true
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      phone_line_members: {
+        Row: {
+          line_id: string
+          person_id: string
+        }
+        Insert: {
+          line_id: string
+          person_id: string
+        }
+        Update: {
+          line_id?: string
+          person_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "phone_line_members_line_id_fkey"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "phone_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "phone_line_members_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      phone_lines: {
+        Row: {
+          analyse_from: string | null
+          callyzer_name: string
+          enabled: boolean
+          enabled_at: string | null
+          enabled_by: string | null
+          first_seen_at: string
+          id: string
+          label: string | null
+          last_call_at: string | null
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          analyse_from?: string | null
+          callyzer_name: string
+          enabled?: boolean
+          enabled_at?: string | null
+          enabled_by?: string | null
+          first_seen_at?: string
+          id?: string
+          label?: string | null
+          last_call_at?: string | null
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          analyse_from?: string | null
+          callyzer_name?: string
+          enabled?: boolean
+          enabled_at?: string | null
+          enabled_by?: string | null
+          first_seen_at?: string
+          id?: string
+          label?: string | null
+          last_call_at?: string | null
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "phone_lines_enabled_by_fkey"
+            columns: ["enabled_by"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pipeline_events: {
         Row: {
           created_at: string
@@ -764,6 +1174,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      storage_deletions: {
+        Row: {
+          created_at: string
+          last_error: string | null
+          last_tried_at: string | null
+          path: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          last_error?: string | null
+          last_tried_at?: string | null
+          path: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          last_error?: string | null
+          last_tried_at?: string | null
+          path?: string
+          reason?: string
+        }
+        Relationships: []
       }
       sync_state: {
         Row: {
@@ -879,18 +1313,226 @@ export type Database = {
       }
     }
     Functions: {
+      call_ids_by_digits: {
+        Args: { p_digits: string; p_limit?: number }
+        Returns: {
+          meeting_id: string
+        }[]
+      }
+      calls_feed_status: { Args: never; Returns: Json }
+      calls_nav: { Args: never; Returns: Json }
+      claim_call_work: {
+        Args: {
+          p_cap_minutes: number
+          p_max_attempts: number
+          p_stale_minutes: number
+          p_transcribe: boolean
+        }
+        Returns: {
+          attempt: number
+          callyzer_id: string
+          duration_sec: number
+          meeting_id: string
+          recording_url: string
+          storage_path: string
+          work: string
+        }[]
+      }
       claim_next_meeting: { Args: { p_exclude?: string[] }; Returns: string }
+      cleanup_call_log: { Args: { p_days?: number }; Returns: number }
       current_person_id: { Args: never; Returns: string }
+      decide_call: {
+        Args: {
+          p_by_name: string
+          p_client_id: string
+          p_meeting_id: string
+          p_type: Database["public"]["Enums"]["meeting_type"]
+        }
+        Returns: string
+      }
+      expire_call_audio: { Args: { p_days: number }; Returns: number }
+      expire_call_recordings: { Args: { p_hours?: number }; Returns: number }
+      expire_undecided_calls: {
+        Args: {
+          p_decision_hours: number
+          p_failed_days: number
+          p_max_days: number
+        }
+        Returns: number
+      }
+      finish_call_copy: {
+        Args: {
+          p_bytes?: number
+          p_callyzer_id: string
+          p_error?: string
+          p_error_kind?: string
+          p_max_attempts?: number
+          p_outcome: string
+        }
+        Returns: string
+      }
+      finish_call_transcription: {
+        Args: {
+          p_error?: string
+          p_error_kind?: string
+          p_max_attempts?: number
+          p_meeting_id: string
+          p_outcome: string
+        }
+        Returns: string
+      }
+      hold_call: {
+        Args: {
+          p_claim: string
+          p_confidence: number
+          p_kind: string
+          p_meeting_id: string
+          p_reason: string
+        }
+        Returns: string
+      }
       is_active_person: { Args: never; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
+      mark_call_business: {
+        Args: {
+          p_claim?: string
+          p_client_id: string
+          p_client_name_guess: string
+          p_confidence: number
+          p_meeting_id: string
+          p_reason: string
+          p_source: Database["public"]["Enums"]["type_source"]
+          p_type: Database["public"]["Enums"]["meeting_type"]
+        }
+        Returns: string
+      }
+      previous_business_call: {
+        Args: { p_meeting_id: string }
+        Returns: {
+          client: string
+          type: Database["public"]["Enums"]["meeting_type"]
+        }[]
+      }
+      promote_call: {
+        Args: {
+          p_bytes: number
+          p_callyzer_id: string
+          p_cap_minutes: number
+          p_mime: string
+          p_playable: boolean
+          p_recording_path: string
+          p_transcribe: boolean
+        }
+        Returns: {
+          meeting_id: string
+          outcome: string
+        }[]
+      }
+      purge_call: {
+        Args: {
+          p_by: string
+          p_code: string
+          p_meeting_id: string
+          p_reason: string
+          p_summary?: string
+        }
+        Returns: string
+      }
+      purge_claimed_call: {
+        Args: {
+          p_claim: string
+          p_code: string
+          p_meeting_id: string
+          p_reason: string
+          p_summary?: string
+        }
+        Returns: string
+      }
+      register_phone_lines: {
+        Args: { p_lines: Json }
+        Returns: {
+          callyzer_name: string
+          created: boolean
+          enabled: boolean
+          line_id: string
+          phone: string
+        }[]
+      }
+      release_stale_call_claims: {
+        Args: { p_max_attempts: number; p_minutes: number }
+        Returns: number
+      }
       release_stale_claims: {
         Args: { p_max_attempts: number; p_timeout_minutes: number }
         Returns: number
       }
+      reserve_call_stt: {
+        Args: {
+          p_cap_minutes: number
+          p_expected_sec: number
+          p_meeting_id: string
+        }
+        Returns: boolean
+      }
+      retry_call_transcription: {
+        Args: { p_meeting_id: string }
+        Returns: boolean
+      }
+      save_call_sheet: {
+        Args: {
+          p_claim: string
+          p_headline: string
+          p_items: Json
+          p_meeting_id: string
+          p_model: string
+          p_prompt_version: string
+          p_result: Json
+          p_reused: Json
+          p_superseded: string[]
+        }
+        Returns: number
+      }
+      save_call_transcript: {
+        Args: {
+          p_audio_sec: number
+          p_meeting_id: string
+          p_min_words?: number
+          p_provider: string
+          p_sentences: number
+          p_speakers: number
+          p_turns: Json
+          p_words: number
+        }
+        Returns: {
+          purge_path: string
+          status: string
+        }[]
+      }
+      switch_line_off: {
+        Args: { p_line_id: string }
+        Returns: {
+          dropped: number
+          purged: number
+        }[]
+      }
+      upsert_call_log: {
+        Args: { p_rows: Json }
+        Returns: {
+          callyzer_id: string
+          inserted: boolean
+          status: string
+        }[]
+      }
     }
     Enums: {
       item_status: "open" | "in_progress" | "done" | "dropped" | "superseded"
-      meeting_type: "client" | "sales" | "internal" | "other" | "unknown"
+      meeting_type:
+        | "client"
+        | "sales"
+        | "internal"
+        | "vendor"
+        | "other"
+        | "unknown"
       owner_side: "dny" | "client" | "both" | "unclear"
       person_role: "admin" | "member"
       priority: "high" | "medium" | "low"
@@ -1036,7 +1678,14 @@ export const Constants = {
   public: {
     Enums: {
       item_status: ["open", "in_progress", "done", "dropped", "superseded"],
-      meeting_type: ["client", "sales", "internal", "other", "unknown"],
+      meeting_type: [
+        "client",
+        "sales",
+        "internal",
+        "vendor",
+        "other",
+        "unknown",
+      ],
       owner_side: ["dny", "client", "both", "unclear"],
       person_role: ["admin", "member"],
       priority: ["high", "medium", "low"],

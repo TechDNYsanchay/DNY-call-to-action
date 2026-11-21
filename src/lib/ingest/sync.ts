@@ -135,12 +135,14 @@ export async function tick({ now = new Date(), deadlineMs = 240_000 }: { now?: D
       }
     }
 
-    // 2. Transcripts still missing, oldest first, at most one attempt each per tick.
+    // 2. Transcripts still missing, oldest first, at most one attempt each per tick. tl;dv meetings only:
+    // phone calls get their transcript from the calls job.
     let readyNow = 0;
     const graceCutoff = new Date(now.getTime() - 10 * 60_000).toISOString();
     const { data: pending, error: pendingError } = await db
       .from("meetings")
       .select("id, tldv_meeting_id, happened_at, duration_sec, transcript_ready, process_status")
+      .eq("kind", "meeting")
       .eq("transcript_ready", false)
       .in("process_status", ["new", "waiting_transcript"])
       .lt("happened_at", graceCutoff)
@@ -163,6 +165,7 @@ export async function tick({ now = new Date(), deadlineMs = 240_000 }: { now?: D
         continue;
       }
       if (decision !== "try") continue;
+      if (!m.tldv_meeting_id) continue;
       try {
         const transcript = await client.getTranscript(m.tldv_meeting_id);
         if (transcript) {

@@ -1,7 +1,14 @@
 // GET /api/cron/retention: nightly (vercel.json, 03:00 IST) with "Authorization: Bearer CRON_SECRET".
 // Trims bookkeeping tables and, for meetings older than settings.retention_months, drops the
 // transcript text and the raw tl;dv payload. Sheets and action items are kept: they are the record.
+// Then the phone calls' share (src/lib/calls/retention.ts): undecided calls past their time, business
+// recordings past calls_audio_retention_days, ledger rows that never became calls, orphaned recordings,
+// and the storage deletion queue.
 
+import { callsDb } from "@/lib/calls/db";
+import { runCallsRetention } from "@/lib/calls/retention";
+import { pgErrorText } from "@/lib/calls/sanitize";
+import { parseCallsSettings } from "@/lib/calls/settings";
 import { optionalEnv } from "@/lib/env";
 import { logEvent } from "@/lib/ingest/intake";
 import { retentionCutoff } from "@/lib/ingest/retention";
@@ -57,7 +64,30 @@ export async function GET(request: Request) {
     trimmed += chunk.length;
   }
 
-  const summary = `Retention: ${webhookEvents ?? 0} webhook events and ${pipelineEvents ?? 0} log lines deleted, ${trimmed} meetings older than ${settings.retention_months} months trimmed${errors.length ? `, ${errors.length} errors` : ""}`;
+  // Phone calls: with the calls' own client (timeouts, no retries). The calls settings fall back to their
+  // defaults when the read fails; the failure is reported.
+  const { data: settingRows, error: sError } = await db.from("settings").select("key, value");
+  if (sError) errors.push(`calls settings: ${pgErrorText(sError)}`);
+  const callsSettings = parseCallsSettings(settingRows ?? []);
+  const calls = await runCallsRetention(callsDb(), { now, settings: callsSettings });
+  errors.push(...calls.errors.map((e) => `calls ${e}`));
+  const callsSummary =
+    `calls: ${calls.undecidedDeleted} undecided deleted, ${calls.audioExpired} recordings older than ${callsSettings.audioRetentionDays} days deleted, ` +
+    `${calls.ledgerCleaned} ledger rows cleaned, ${calls.orphansQueued} orphaned recordings queued, ${calls.objectsRemoved} objects removed` +
+    (calls.objectRemovalsFailed ? ` (${calls.objectRemovalsFailed} still queued)` : "");
+
+  const summary = `Retention: ${webhookEvents ?? 0} webhook events and ${pipelineEvents ?? 0} log lines deleted, ${trimmed} meetings older than ${settings.retention_months} months trimmed; ${callsSummary}${errors.length ? `, ${errors.length} errors` : ""}`;
   await logEvent(errors.length ? "warn" : "info", "retention", errors.length ? `${summary}: ${errors.join("; ")}` : summary);
-  return Response.json({ ok: errors.length === 0, webhookEventsDeleted: webhookEvents ?? 0, pipelineEventsDeleted: pipelineEvents ?? 0, meetingsTrimmed: trimmed, cutoff, errors }, { status: errors.length ? 500 : 200 });
+  const callCounts = {
+    undecidedDeleted: calls.undecidedDeleted,
+    audioExpired: calls.audioExpired,
+    ledgerCleaned: calls.ledgerCleaned,
+    orphansQueued: calls.orphansQueued,
+    objectsRemoved: calls.objectsRemoved,
+    objectRemovalsFailed: calls.objectRemovalsFailed,
+  };
+  return Response.json(
+    { ok: errors.length === 0, webhookEventsDeleted: webhookEvents ?? 0, pipelineEventsDeleted: pipelineEvents ?? 0, meetingsTrimmed: trimmed, cutoff, calls: callCounts, errors },
+    { status: errors.length ? 500 : 200 },
+  );
 }

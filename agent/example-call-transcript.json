@@ -1,0 +1,15 @@
+[
+  { "speaker": "Speaker 1", "startSec": 0.8, "endSec": 2.6, "text": "Hello, haan Ashwini ji, boliye." },
+  { "speaker": "Speaker 2", "startSec": 3.4, "endSec": 13.9, "text": "Namaste Rakesh ji. Main menu costing ke baare mein call kar rahi thi. Aapne jo naya menu bheja tha, uski costing humne nikaal li hai." },
+  { "speaker": "Speaker 1", "startSec": 14.6, "endSec": 17.2, "text": "Achha. Toh food cost kitna aa raha hai?" },
+  { "speaker": "Speaker 2", "startSec": 18.1, "endSec": 29.4, "text": "Abhi food cost 41 percent aa raha hai, target 34 percent ka hai. Paneer aur dairy ke rates sabse zyada badhe hain." },
+  { "speaker": "Speaker 1", "startSec": 30.2, "endSec": 40.5, "text": "Haan, dairy wala har mahine rate badha deta hai. Pichhle mahine sirf dairy ka bill 1.8 lakh aaya tha." },
+  { "speaker": "Speaker 2", "startSec": 41.3, "endSec": 51.6, "text": "Isiliye mujhe aapke vendor bills chahiye, last teen mahine ke. Unse hum dekh lenge kahan negotiate kar sakte hain." },
+  { "speaker": "Speaker 1", "startSec": 52.4, "endSec": 58.1, "text": "Theek hai, main kal tak saare vendor bills WhatsApp pe bhej deta hoon." },
+  { "speaker": "Speaker 2", "startSec": 59.0, "endSec": 67.3, "text": "Perfect. Aur main revised menu costing Friday tak bhej dungi, portion size ke saath." },
+  { "speaker": "Speaker 1", "startSec": 68.2, "endSec": 76.4, "text": "Friday theek hai. Bas dhyan rakhna ki dishes ke rate customer ke liye zyada na badhein." },
+  { "speaker": "Speaker 2", "startSec": 77.1, "endSec": 86.9, "text": "Bilkul, selling price same rakhenge, portion aur recipe se cost kam karenge." },
+  { "speaker": "Speaker 1", "startSec": 87.7, "endSec": 94.2, "text": "Achha hai. Monday ko phir call karte hain, tab costing dekh lenge." },
+  { "speaker": "Speaker 2", "startSec": 95.0, "endSec": 100.3, "text": "Haan, Monday ko main call karti hoon. Thank you Rakesh ji." },
+  { "speaker": "Speaker 1", "startSec": 101.0, "endSec": 102.4, "text": "Thank you, bye." }
+]

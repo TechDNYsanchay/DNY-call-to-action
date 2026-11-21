@@ -76,7 +76,7 @@ export async function knownMeetingIds(tldvMeetingIds: string[]): Promise<Set<str
   if (!tldvMeetingIds.length) return new Set();
   const { data, error } = await supabaseAdmin().from("meetings").select("tldv_meeting_id").in("tldv_meeting_id", tldvMeetingIds);
   if (error) throw new Error(`meetings read failed: ${error.message}`);
-  return new Set((data ?? []).map((m) => m.tldv_meeting_id));
+  return new Set((data ?? []).map((m) => m.tldv_meeting_id).filter((id): id is string => id !== null));
 }
 
 export interface UpsertResult {
