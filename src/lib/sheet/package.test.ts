@@ -71,7 +71,7 @@ describe("a call's package", () => {
     roster: [{ full_name: "Ashwini Bhambani", email: "ashwini@dnyhospitality.com", dept: "Account management" }],
     call: {
       direction: "outgoing",
-      line: { id: "5c1f8a2e-6b7d-4e3f-9a10-2b3c4d5e6f70", name: "Ashwini 9820000001", people: [{ name: "Ashwini Bhambani", email: "ashwini@dnyhospitality.com", role: "Account management" }] },
+      line: { id: "5c1f8a2e-6b7d-4e3f-9a10-2b3c4d5e6f70", name: "Ashwini 9820000001", people: [{ name: "Ashwini Bhambani", email: "ashwini@dnyhospitality.com", role: "Account management" }], salesGetSheets: false },
       savedName: "Rakesh 98201 23456",
       previouslyBusiness: { type: "client", client: "Cafe 89" },
       speakers: 2,

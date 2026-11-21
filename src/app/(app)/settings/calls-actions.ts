@@ -105,6 +105,20 @@ export async function switchLineOff(id: string): Promise<ActionResult<{ dropped:
   }
 }
 
+/** Whether sales enquiries on a line also get a sheet (written up like a client call). */
+export async function setLineSalesSheets(id: string, on: boolean): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+    if (!UUID.test(id)) throw new Error("Unknown line");
+    const { error } = await supabaseAdmin().from("phone_lines").update({ sales_get_sheets: on }).eq("id", id);
+    if (error) throw new Error(error.message);
+    revalidateCalls();
+    return ok();
+  } catch (e) {
+    return failed(e);
+  }
+}
+
 /** The name people see for a line ("Supply desk"); empty goes back to the automatic name. */
 export async function setLineLabel(id: string, label: string): Promise<ActionResult> {
   try {

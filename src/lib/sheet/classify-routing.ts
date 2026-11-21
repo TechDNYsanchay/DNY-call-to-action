@@ -26,8 +26,11 @@ export type CallRouting = { action: "proceed"; type: "client" | "vendor" } | { a
  * deletion cannot be undone). Any other type deletes the call only at or above the threshold; below it a
  * person decides.
  */
-export function routeCallClassification(type: CallClassType, confidence: number, threshold: number): CallRouting {
+export function routeCallClassification(type: CallClassType, confidence: number, threshold: number, salesGetSheets = false): CallRouting {
   if (type === "client" || type === "vendor") return { action: "proceed", type };
+  // On a line whose sales enquiries get a sheet (Settings > Phone calls), a confident sales answer is written up
+  // like a client call, with the prospect as the client side.
+  if (type === "sales" && salesGetSheets && confidence >= threshold) return { action: "proceed", type: "client" };
   const code = callSkipCode(type);
   if (!code || !(confidence >= threshold)) return { action: "hold", kind: "unsure" };
   return { action: "purge", code };

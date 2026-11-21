@@ -41,7 +41,7 @@ describe("ownerEmailForCall", () => {
 
 describe("callParticipantNames", () => {
   it("adds the line's people and the saved contact name", () => {
-    const line = { id: "l", name: "Ashwini's phone", people: [{ name: "Ashwini Bhambani", email: "a@dnyhospitality.com", role: null }] };
+    const line = { id: "l", name: "Ashwini's phone", people: [{ name: "Ashwini Bhambani", email: "a@dnyhospitality.com", role: null }], salesGetSheets: false };
     expect(callParticipantNames({ line, savedName: "Rakesh Cafe 89" })).toEqual(["Ashwini Bhambani", "Rakesh Cafe 89"]);
     expect(callParticipantNames({ line: { ...line, people: [] }, savedName: null })).toEqual([]);
   });

@@ -24,7 +24,7 @@ export interface ClientSummary {
 export interface CallContext {
   direction: "incoming" | "outgoing";
   /** The DNY phone: its label, else its Callyzer name; the active people on it, with their department. */
-  line: { id: string; name: string; people: Array<{ name: string; email: string; role: string | null }> };
+  line: { id: string; name: string; people: Array<{ name: string; email: string; role: string | null }>; salesGetSheets: boolean };
   /** The contact name saved on that phone (call_log.counterpart_name); informal, may be null. */
   savedName: string | null;
   /** The newest other call with this number that is still a client or vendor call. */
@@ -130,7 +130,7 @@ export async function loadCallContext(db: Db, meeting: MeetingRow, turns: Speake
   const [facts, ledger, clients, previouslyBusiness] = await Promise.all([
     db
       .from("phone_calls")
-      .select("direction, speaker_count, purged_at, line:phone_lines(id, label, callyzer_name, members:phone_line_members(person:people(full_name, email, dept, active)))")
+      .select("direction, speaker_count, purged_at, line:phone_lines(id, label, callyzer_name, sales_get_sheets, members:phone_line_members(person:people(full_name, email, dept, active)))")
       .eq("meeting_id", meeting.id)
       .maybeSingle(),
     db.from("call_log").select("counterpart_name").eq("meeting_id", meeting.id).maybeSingle(),
@@ -148,7 +148,7 @@ export async function loadCallContext(db: Db, meeting: MeetingRow, turns: Speake
   const speakers = turns.length ? new Set(turns.map((t) => t.speaker)).size : facts.data.speaker_count ?? 0;
   return {
     direction: asDirection(facts.data.direction),
-    line: { id: line?.id ?? "", name: line?.label ?? line?.callyzer_name ?? "", people },
+    line: { id: line?.id ?? "", name: line?.label ?? line?.callyzer_name ?? "", people, salesGetSheets: Boolean(line?.sales_get_sheets) },
     savedName: ledger.data?.counterpart_name ?? null,
     previouslyBusiness,
     speakers,

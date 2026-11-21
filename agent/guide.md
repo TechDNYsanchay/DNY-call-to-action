@@ -98,8 +98,12 @@ Answer in `classificationFormat` (the call version):
 - `internal`: DNY colleagues. `personal`: a private call. `wrong_number`: the caller wanted someone else.
   `no_content`: no real conversation (IVR, voicemail, hold music, garbled).
 
-Only client and vendor calls get a sheet. A confident answer of any other type deletes the call's recording and
-transcript for good, so:
+Some lines also write up sales enquiries: when `call.line.salesEnquiriesGetSheet` is true, classify a prospect's
+enquiry honestly as `sales`; the server answers `proceed: true` with type `client`, and you write the sheet with the
+prospect as the client side (what they owe goes under the client). Never skip such a call as sales.
+
+Only client and vendor calls get a sheet (and sales enquiries on those lines). A confident answer of any other type
+deletes the call's recording and transcript for good, so:
 - If any part of the call is about work with a client or a supplier, it is `client` or `vendor`.
 - If you are not sure, give the type you think most likely with an honest confidence below
   `classification.threshold`. A person then decides. Never raise your confidence to force an outcome.

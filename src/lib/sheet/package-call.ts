@@ -14,7 +14,8 @@ export const MAX_KNOWN_CLIENTS = 500;
 export interface CallBlock {
   direction: "incoming" | "outgoing";
   /** The DNY phone and the people who use it. */
-  line: { name: string; people: Array<{ name: string; role: string | null }> };
+  /** salesEnquiriesGetSheet: on this line a confident sales answer gets a sheet like a client call. */
+  line: { name: string; people: Array<{ name: string; role: string | null }>; salesEnquiriesGetSheet: boolean };
   /** The other party: the contact name saved on the phone, and what earlier calls with this number were. */
   counterpart: { savedName: string | null; previousClient: string | null; previouslyBusiness: "client" | "vendor" | null };
   speakers: number;
@@ -28,6 +29,7 @@ export function callBlockOf(call: CallContext): CallBlock {
     line: {
       name: nameWithoutNumber(call.line.name) ?? "A DNY phone",
       people: call.line.people.map((p) => ({ name: nameWithoutNumber(p.name) ?? "", role: p.role })).filter((p) => p.name),
+      salesEnquiriesGetSheet: call.line.salesGetSheets,
     },
     counterpart: {
       savedName: nameWithoutNumber(call.savedName),

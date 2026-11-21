@@ -3,6 +3,14 @@ import { matchClientName, routeCallClassification, routeClassification } from ".
 import { CALL_CLASS_TYPES } from "./schema";
 
 describe("routeClassification", () => {
+  it("writes up a confident sales enquiry like a client call only on a line whose enquiries get a sheet", () => {
+    expect(routeCallClassification("sales", 0.9, 0.8, true)).toEqual({ action: "proceed", type: "client" });
+    expect(routeCallClassification("sales", 0.9, 0.8, false)).toEqual({ action: "purge", code: "sales" });
+    expect(routeCallClassification("sales", 0.6, 0.8, true)).toEqual({ action: "hold", kind: "unsure" });
+    expect(routeCallClassification("personal", 0.95, 0.8, true)).toEqual({ action: "purge", code: "personal" });
+    expect(routeCallClassification("vendor", 0.5, 0.8, true)).toEqual({ action: "proceed", type: "vendor" });
+  });
+
   it("continues only for confident client meetings", () => {
     expect(routeClassification("client", 0.9, 0.8)).toEqual({ status: "processing", proceed: true });
     expect(routeClassification("client", 0.8, 0.8)).toEqual({ status: "processing", proceed: true });

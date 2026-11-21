@@ -1040,6 +1040,7 @@ export type Database = {
           label: string | null
           last_call_at: string | null
           phone: string
+          sales_get_sheets: boolean
           updated_at: string
         }
         Insert: {
@@ -1053,6 +1054,7 @@ export type Database = {
           label?: string | null
           last_call_at?: string | null
           phone: string
+          sales_get_sheets?: boolean
           updated_at?: string
         }
         Update: {
@@ -1066,6 +1068,7 @@ export type Database = {
           label?: string | null
           last_call_at?: string | null
           phone?: string
+          sales_get_sheets?: boolean
           updated_at?: string
         }
         Relationships: [

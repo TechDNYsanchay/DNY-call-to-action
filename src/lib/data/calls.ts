@@ -381,6 +381,8 @@ export interface AdminLine extends LineSummary {
   phone: string;
   enabledAt: string | null;
   analyseFrom: string | null;
+  /** Sales enquiries on this line get a sheet too. */
+  salesGetSheets: boolean;
   lastCallAt: string | null;
   firstSeenAt: string;
   /** Today's (IST) calls on the line: the last poll's counts, and how many became a call in the app. */
@@ -425,7 +427,7 @@ export async function getPhoneCallsAdmin(): Promise<PhoneCallsAdmin> {
   const [settings, sync, lines, people, failedCopies, ledgerToday, stubs, latency, rereads, feed] = await Promise.all([
     admin.from("settings").select("key, value"),
     admin.from("sync_state").select("value").eq("key", "callyzer").maybeSingle(),
-    admin.from("phone_lines").select("id, phone, label, callyzer_name, enabled, enabled_at, analyse_from, first_seen_at, last_call_at, members:phone_line_members(person:people(id, full_name, active))").order("callyzer_name"),
+    admin.from("phone_lines").select("id, phone, label, callyzer_name, enabled, enabled_at, analyse_from, sales_get_sheets, first_seen_at, last_call_at, members:phone_line_members(person:people(id, full_name, active))").order("callyzer_name"),
     listActivePeople(),
     admin.from("call_log").select("callyzer_id", { count: "exact", head: true }).eq("status", "failed").gte("call_started_at", yesterdayStart),
     admin.from("call_log").select("line_id, status").gte("call_started_at", todayStart).limit(2000),
@@ -448,7 +450,7 @@ export async function getPhoneCallsAdmin(): Promise<PhoneCallsAdmin> {
   const analysed = new Map<string, number>();
   for (const row of ledgerToday.data ?? []) if (row.status === "promoted") analysed.set(row.line_id, (analysed.get(row.line_id) ?? 0) + 1);
 
-  type AdminLineRow = LineEmbed & { phone: string; enabled_at: string | null; analyse_from: string | null; first_seen_at: string; last_call_at: string | null };
+  type AdminLineRow = LineEmbed & { phone: string; enabled_at: string | null; analyse_from: string | null; sales_get_sheets: boolean; first_seen_at: string; last_call_at: string | null };
   const adminLines = ((lines.data ?? []) as unknown as AdminLineRow[]).map((l): AdminLine => {
     const counts = pollLines[l.id] ?? { calls: 0, candidates: 0, withLink: 0 };
     return {
@@ -456,6 +458,7 @@ export async function getPhoneCallsAdmin(): Promise<PhoneCallsAdmin> {
       phone: l.phone,
       enabledAt: l.enabled_at,
       analyseFrom: l.analyse_from,
+      salesGetSheets: l.sales_get_sheets,
       lastCallAt: l.last_call_at,
       firstSeenAt: l.first_seen_at,
       today: { calls: counts.calls ?? 0, candidates: counts.candidates ?? 0, withLink: counts.withLink ?? 0, analysed: analysed.get(l.id) ?? 0 },

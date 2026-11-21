@@ -8,6 +8,7 @@ const context = (over: Partial<CallContext> = {}): CallContext => ({
     id: "5c1f8a2e-6b7d-4e3f-9a10-2b3c4d5e6f70",
     name: "Ashwini Bhambani",
     people: [{ name: "Ashwini Bhambani", email: "ashwini@dnyhospitality.com", role: "Account management" }],
+    salesGetSheets: false,
   },
   savedName: "Rakesh Cafe 89",
   previouslyBusiness: { type: "client", client: "Cafe 89" },
@@ -22,7 +23,7 @@ describe("callBlockOf", () => {
   it("describes the line, its people and the other party, never an e-mail, an id or a number", () => {
     expect(callBlockOf(context())).toEqual({
       direction: "incoming",
-      line: { name: "Ashwini Bhambani", people: [{ name: "Ashwini Bhambani", role: "Account management" }] },
+      line: { name: "Ashwini Bhambani", people: [{ name: "Ashwini Bhambani", role: "Account management" }], salesEnquiriesGetSheet: false },
       counterpart: { savedName: "Rakesh Cafe 89", previousClient: "Cafe 89", previouslyBusiness: "client" },
       speakers: 2,
       oneSided: false,
@@ -33,12 +34,12 @@ describe("callBlockOf", () => {
   it("drops phone numbers from every name, and names a line known only by its number", () => {
     const block = callBlockOf(
       context({
-        line: { id: "x", name: "+91 98200 00001", people: [{ name: "9820000002", email: "x@dnyhospitality.com", role: null }] },
+        line: { id: "x", name: "+91 98200 00001", people: [{ name: "9820000002", email: "x@dnyhospitality.com", role: null }], salesGetSheets: false },
         savedName: "Rakesh 98201 23456",
         previouslyBusiness: { type: "vendor", client: null },
       }),
     );
-    expect(block.line).toEqual({ name: "A DNY phone", people: [] });
+    expect(block.line).toEqual({ name: "A DNY phone", people: [], salesEnquiriesGetSheet: false });
     expect(block.counterpart).toEqual({ savedName: "Rakesh", previousClient: null, previouslyBusiness: "vendor" });
     expect(callBlockOf(context({ savedName: "+91 98201 23456", previouslyBusiness: null })).counterpart).toEqual({
       savedName: null,

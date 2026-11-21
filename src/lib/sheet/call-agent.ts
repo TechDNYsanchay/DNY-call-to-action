@@ -37,6 +37,7 @@ export interface CallReleaseOutcome {
 }
 
 export const HUMAN_LABEL_SKIP = "A person marked this a business call; save the sheet or release it";
+export const SALES_LINE_SKIP = "Sales enquiries on this line get a sheet: classify the call as client and write the sheet, or release it";
 const KEPT_TEXT = "Routine said not a work call on a re-run; the sheet was kept";
 const NOT_FOUND = "Meeting not found";
 
@@ -70,6 +71,14 @@ async function readCallsSettings(db: Db): Promise<CallsSettings> {
   const { data, error } = await db.from("settings").select("key, value");
   if (error) throw new Error(`settings: ${error.message}`);
   return parseCallsSettings(data ?? []);
+}
+
+/** Whether the call's line writes up sales enquiries too (Settings > Phone calls). */
+async function lineSalesGetSheets(db: Db, meetingId: string): Promise<boolean> {
+  const { data, error } = await db.from("phone_calls").select("line:phone_lines(sales_get_sheets)").eq("meeting_id", meetingId).maybeSingle();
+  if (error) throw new Error(`phone_calls: ${error.message}`);
+  const line = data?.line as { sales_get_sheets?: boolean } | { sales_get_sheets?: boolean }[] | null | undefined;
+  return Boolean(Array.isArray(line) ? line[0]?.sales_get_sheets : line?.sales_get_sheets);
 }
 
 async function sheetCount(db: Db, meetingId: string): Promise<number> {
@@ -275,8 +284,8 @@ export async function applyCallClassification(meetingId: string, json: unknown, 
     return { ok: true, proceed: true, status: "processing", type: meeting.type, confidence: 1, errors: [] };
   }
 
-  const [settings, calls, sheets] = await Promise.all([readAgentSettings(), readCallsSettings(db), sheetCount(db, meeting.id)]);
-  const routing = routeCallClassification(c.type, c.confidence, settings.confidenceThreshold);
+  const [settings, calls, sheets, salesGetSheets] = await Promise.all([readAgentSettings(), readCallsSettings(db), sheetCount(db, meeting.id), c.type === "sales" ? lineSalesGetSheets(db, meeting.id) : false]);
+  const routing = routeCallClassification(c.type, c.confidence, settings.confidenceThreshold, salesGetSheets);
   if (routing.action === "proceed") return markBusiness(db, claimed, { ...c, type: routing.type });
   // Not a work call. A re-run's call that already has a sheet keeps it, sure or not.
   if (sheets > 0) return classifyAnswer(await keepSheet(claimed, "classify"), meeting, c);
@@ -296,6 +305,10 @@ export async function skipCall(meetingId: string, code: SkipCode, claim: string 
   const claimed = await claimedCall(db, meetingId, claim);
   if ("refused" in claimed) return { ok: false, status: null, errors: [claimed.refused.error], httpStatus: claimed.refused.httpStatus };
   const { meeting } = claimed;
+  if (code === "sales" && (await lineSalesGetSheets(db, meeting.id))) {
+    await logPipelineEvent(meeting.id, "info", "agent", "Routine tried to skip a sales enquiry on a line whose enquiries get a sheet");
+    return { ok: false, status: null, errors: [SALES_LINE_SKIP], httpStatus: 409 };
+  }
   const ended: Ended = await (async () => {
     if (meeting.type_source === "human" && isEligibleType("call", meeting.type)) return { kind: "labelled" as const };
     const [calls, sheets] = await Promise.all([readCallsSettings(db), sheetCount(db, meeting.id)]);

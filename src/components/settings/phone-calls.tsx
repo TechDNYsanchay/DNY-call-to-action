@@ -15,6 +15,7 @@ import {
   setDnyNumbers,
   setLineEnabled,
   setLineLabel,
+  setLineSalesSheets,
   setLineMembers,
   switchLineOff,
 } from "@/app/(app)/settings/calls-actions";
@@ -209,6 +210,25 @@ function LineSwitch({ line }: { line: AdminLine }) {
   );
 }
 
+function LineSalesSheets({ line }: { line: AdminLine }) {
+  const { pending, run } = useAction();
+  return (
+    <label className="mt-1.5 flex cursor-pointer items-center gap-2 text-[12px] text-ink-2">
+      <input
+        type="checkbox"
+        checked={line.salesGetSheets}
+        disabled={pending}
+        onChange={(e) => {
+          const on = e.currentTarget.checked;
+          run(() => setLineSalesSheets(line.id, on), on ? `Sales enquiries on ${line.name} now get a CTA` : `Sales enquiries on ${line.name} are left to Sales QA again`);
+        }}
+        className="size-4 accent-[var(--color-bottle)]"
+      />
+      Sales enquiries get a CTA too
+    </label>
+  );
+}
+
 function LineLabel({ line }: { line: AdminLine }) {
   const { pending, run } = useAction();
   const [value, setValue] = useState(line.label ?? "");
@@ -304,6 +324,7 @@ function LinesList({ lines, people, initialLines, nowIso }: { lines: AdminLine[]
                 {line.enabled && line.analyseFrom ? `On since ${formatCallWhen(line.analyseFrom, new Date(nowIso))}` : "Off"}
                 {line.lastCallAt && ` · last call ${timeAgo(line.lastCallAt, new Date(nowIso))}`}
               </p>
+              <LineSalesSheets line={line} />
               {line.enabled && line.members.length === 0 && (
                 <Chip tone="sienna" className="mt-1.5 h-auto py-1 leading-[16px] whitespace-normal">
                   <Warning size={12} aria-hidden="true" className="shrink-0" />
