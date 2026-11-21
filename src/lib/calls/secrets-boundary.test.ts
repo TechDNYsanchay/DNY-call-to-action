@@ -31,13 +31,21 @@ const SECRET_STORES = (rel: string) =>
   /^supabase\/migrations\/\d+_callyzer_calls\.sql$/.test(rel) ||
   rel === "supabase/tests/calls_test.sql";
 
+// Sync's owed-items response names the tl;dv meeting link `recording_url` (Sync reads that field). It is the
+// meeting's tldv_url, never a Callyzer link, so that file may use the name only in that exact mapping.
+const TLDV_LINK_ONLY = (rel: string) => {
+  if (rel !== "src/app/api/erp/action-items/route.ts") return false;
+  const text = tree.find((f) => f.rel === rel)?.text ?? "";
+  return text.split("recording_url").length - 1 === (text.match(/recording_url: meeting\.tldv_url\b/g) ?? []).length;
+};
+
 describe("the secrets boundary", () => {
   it("scans the source tree", () => {
     expect(tree.length).toBeGreaterThan(100);
     expect(tree.some((f) => f.rel === "src/lib/calls/rules.ts")).toBe(true);
   });
   it("keeps recording_url in the calls pipeline, the generated types, the migration and its SQL tests", () => {
-    const outside = using("recording_url").filter((rel) => !SECRET_STORES(rel));
+    const outside = using("recording_url").filter((rel) => !SECRET_STORES(rel) && !TLDV_LINK_ONLY(rel));
     expect(outside).toEqual([]);
   });
   it("keeps counterpart_e164 there too, plus the calls data module and the database's own lookup of earlier calls", () => {
