@@ -106,6 +106,7 @@ before unpausing calls (the old prompt sends no claim, so it cannot finish a cal
 | `src/lib/calls/` | Phone calls: intake rules, the calls job (poll, copy, Deepgram), purge, holds, retention |
 | `src/app/api/cron/calls/` | The calls job's route |
 | `src/app/api/agent/` | The routine's work API |
+| `src/app/api/erp/` | Sync's API: book and cancel client meetings, read their DNY-owed items (`ERP_INTEGRATION_SECRET`; `docs/erp-integration.md`) |
 | `src/app/(app)/` | Signed-in screens |
 | `agent/` | The guide the routine reads and the routine prompt |
 | `PLAN.md` | The plan this was built from |
