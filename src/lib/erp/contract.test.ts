@@ -1,6 +1,23 @@
 import { describe, expect, it } from "vitest";
 
-import { bookingRequest, evidenceLine, goesToErp, MAX_BOOKINGS_PER_READ, parseBookingIds } from "./contract";
+import { bookingRequest, evidenceLine, goesToErp, MAX_BOOKINGS_PER_READ, parseBookingIds, parseSince } from "./contract";
+
+describe("parseSince", () => {
+  const now = Date.parse("2026-11-24T07:00:00Z");
+  it("asks back the default when Sync sends nothing, and takes a date it sends", () => {
+    const d = parseSince(null, now);
+    expect(d.ok && d.since.toISOString()).toBe("2026-11-10T07:00:00.000Z");
+    const s = parseSince("2026-11-20T00:00:00Z", now);
+    expect(s.ok && s.since.toISOString()).toBe("2026-11-20T00:00:00.000Z");
+  });
+
+  it("holds a date to the last 30 days and refuses what is not one", () => {
+    const old = parseSince("2025-01-01", now);
+    expect(old.ok && old.since.toISOString()).toBe("2026-10-25T07:00:00.000Z");
+    expect(parseSince("yesterday", now).ok).toBe(false);
+    expect(parseSince("2026-13-45", now).ok).toBe(false);
+  });
+});
 
 const valid = {
   contract: "1",

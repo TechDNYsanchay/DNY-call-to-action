@@ -66,3 +66,41 @@ export function evidenceLine(i: { evidence_ts_sec: number | null; evidence_speak
   const who = i.evidence_speaker?.trim() ? `${i.evidence_speaker.trim()}: ` : "";
   return `${at}${who}“${quote}”`;
 }
+
+/** GET /api/erp/calls?since=… — how far back Sync may ask, and how far it asks when it does not say. */
+export const CALLS_DEFAULT_DAYS = 14;
+export const CALLS_MAX_DAYS = 30;
+export const MAX_CALLS_PER_READ = 500;
+
+/**
+ * The moment Sync asks from: its `since`, held to the last CALLS_MAX_DAYS days, or CALLS_DEFAULT_DAYS
+ * back when it sends none.
+ */
+export function parseSince(raw: string | null, now: number): { ok: true; since: Date } | { ok: false; error: string } {
+  const floor = now - CALLS_MAX_DAYS * 86_400_000;
+  if (!raw) return { ok: true, since: new Date(now - CALLS_DEFAULT_DAYS * 86_400_000) };
+  const t = Date.parse(raw);
+  if (!/^\d{4}-\d{2}-\d{2}/.test(raw) || Number.isNaN(t)) return { ok: false, error: "since is not a date" };
+  return { ok: true, since: new Date(Math.max(t, floor)) };
+}
+
+/**
+ * A conversation Sync did not book: a phone call on a client-work line, or a recording nobody booked
+ * from Sync. Sync decides who approves its CTAs from the line's people, then whoever recorded it.
+ * The counterpart's number is never sent.
+ */
+export interface ErpCall {
+  id: string;
+  kind: "call" | "meeting";
+  title: string | null;
+  happened_at: string;
+  duration_sec: number;
+  client_name: string | null;
+  counterpart_name: string | null;
+  line_name: string | null;
+  line_member_emails: string[];
+  organizer_email: string | null;
+  process_status: string;
+  url: string;
+  items: ErpActionItem[];
+}
