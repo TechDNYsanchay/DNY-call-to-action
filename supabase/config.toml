@@ -1,3 +1,8 @@
+# Shared Supabase project "dny-agents" (ref iaxjxefipmdumfukttvv): Call to Action owns schema public,
+# Sales QA (repo dny-call-qa) owns schema qa. The hosted config (API, Auth, the magic-link email) is one
+# for both apps, so this file and dny-call-qa's supabase/config.toml hold the same settings (only
+# project_id differs): change both, and both supabase/templates/magic_link.html files, together.
+
 # For detailed configuration reference documentation, visit:
 # https://supabase.com/docs/guides/local-development/cli/config
 # A string used to distinguish different Supabase projects on the same host. Defaults to the
@@ -10,7 +15,7 @@ enabled = true
 port = 54321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
 # endpoints. `public` and `graphql_public` schemas are included by default.
-schemas = ["public", "graphql_public"]
+schemas = ["public", "graphql_public", "qa"]
 # Extra schemas to add to the search_path of every request.
 extra_search_path = ["public", "extensions"]
 # The maximum number of rows returned from a view, table, or stored procedure. Limits payload size
@@ -167,6 +172,9 @@ additional_redirect_urls = [
   "https://dny-call-to-action.vercel.app/auth/callback",
   "http://localhost:3200/auth/callback",
   "http://localhost:3200/auth/callback**",
+  # Sales QA (dny-call-qa) shares this project and signs in here too.
+  "https://dny-call-qa.vercel.app/auth/callback",
+  "http://localhost:3100/auth/callback",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
@@ -262,7 +270,8 @@ otp_expiry = 3600
 # One-time sign-in email in the app's own look. The link lands on our /auth/callback with the hashed
 # token (not on Supabase's verify page), so it works on any device. Applied with `npx supabase config push`.
 [auth.email.template.magic_link]
-subject = "Your Call to Action sign-in link"
+# Shared with Sales QA: a link that returns to Sales QA gets its subject and email (supabase/templates/magic_link.html).
+subject = "{{ if or (eq (printf \"%.30s\" .RedirectTo) \"https://dny-call-qa.vercel.app\") (eq (printf \"%.21s\" .RedirectTo) \"http://localhost:3100\") }}Your DNY Sales Agent sign-in link{{ else }}Your Call to Action sign-in link{{ end }}"
 content_path = "./supabase/templates/magic_link.html"
 
 # Uncomment to customize notification email template

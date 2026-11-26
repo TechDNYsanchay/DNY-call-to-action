@@ -14,7 +14,7 @@ dny-call-qa), project `dny-call-to-action`. GitHub: `TechDNYsanchay/DNY-call-to-
 `git push dny main && git push personal main` (`dny` uses the SSH host `github-dny`; `personal` uses plain
 `github.com`, which is the tariquescript key). The `origin` remote is the plain HTTPS URL kept only so the Vercel CLI
 can read it.
-The Vercel project is connected to the DNY repo only: every push to its `main` deploys production, so push only green builds. Supabase: project `dny-call-to-action` (ref `iaxjxefipmdumfukttvv`, Mumbai) in
+The Vercel project is connected to the DNY repo only: every push to its `main` deploys production, so push only green builds. Supabase: project `dny-agents` (ref `iaxjxefipmdumfukttvv`, Mumbai; named `dny-call-to-action` until 26 Nov 2026, shared with Sales QA since then, see below) in
 tech@dnyhospitality.com's organisation. Apart from that GitHub mirror, never use the personal tariquescript accounts (no personal Vercel or Supabase). The machine's global Vercel login is the personal one and
 must stay that way: run every Vercel command through `bash scripts/vc.sh ...` (it uses the DNY login kept in
 `~/.config/vercel-dny`); `bash scripts/vc.sh whoami` must print the DNY identity (tech-5297). `.vercel/project.json`
@@ -22,8 +22,28 @@ pins the project.
 
 ## Separation from the sales agent
 
-This app is fully separate from dny-call-qa: its own Google Cloud project and OAuth client, its own Supabase
-project, its own Vercel project, its own tl;dv webhook. Shared with it: the company tl;dv account (and its API key),
+This app is separate from dny-call-qa (Sales QA): its own Google Cloud project, its own Vercel project, its own
+tl;dv webhook. Since 26 Nov 2026 the two apps share one Supabase project (`dny-agents`) to save the cost of a second:
+
+- Schemas: this app owns `public`; Sales QA owns `qa` (its clients set `db.schema = "qa"`). Never read or change `qa`
+  from here; never add Sales QA objects to `public`.
+- Logins (`auth.users`) are shared: someone on both team lists has one login, and each app lets a login in only if its
+  own `people` table lists the person as active. Removing a person here bans their login (people-admin), which also
+  stops them signing in to Sales QA until they are re-added here. Sales QA creates logins with find-or-create and never
+  bans or deletes them (except its `@sample.invalid` sample accounts).
+- Auth settings are one set for both apps: Sales QA's callback URLs are in `additional_redirect_urls`, the Google
+  provider is this app's OAuth client, and `supabase/templates/magic_link.html` sends Sales QA's own email when the link
+  returns to Sales QA (subject likewise). dny-call-qa's `supabase/config.toml` and template are kept identical to this
+  repo's (only `project_id` differs): change both together, and push config from either repo only with them in sync.
+  The magic-link email rate limit (`auth.rate_limit.email_sent`) is shared by both apps.
+- Migration history is shared: `supabase/migrations/*_qa_*.sql` are placeholders for Sales QA's migrations so
+  `npx supabase db push --remote` here sees the whole history (the first one creates the empty `qa` schema locally so
+  the API starts). When Sales QA adds a migration, add a `<version>_qa_<name>.sql` placeholder here before the next push;
+  each migration added here needs a `<version>_cta_<name>.sql` placeholder in dny-call-qa.
+- Storage: this app's bucket is `call-recordings`; Sales QA's are `recordings` and `references`.
+
+Sales QA's old project `dny-call-qa` (ref `jlqppprkvlwhtbvhgiik`) was renamed `trs` for future TRS work.
+Shared with it: the company tl;dv account (and its API key),
 and the Callyzer and Deepgram keys (copied from Sales QA, below).
 The ERP it will integrate with later is GitHub repo TechDNYsanchay/dny-erp.
 

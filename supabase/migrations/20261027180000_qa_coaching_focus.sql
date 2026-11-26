@@ -1,0 +1,3 @@
+-- Placeholder: migration 20261027180000 (coaching_focus) belongs to Sales QA (repo dny-call-qa, schema qa), which
+-- shares this Supabase project. It is applied from that repo; this file only lets `supabase db push`
+-- here see the shared migration history.

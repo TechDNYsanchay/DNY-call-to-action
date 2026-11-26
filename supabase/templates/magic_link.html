@@ -1,3 +1,18 @@
+{{/* Shared by Call to Action and Sales QA (one Supabase project). Sales QA sign-ins redirect to its own origin; everything else gets the Call to Action email. Keep this file identical in both repos. */}}
+{{ if or (eq (printf "%.30s" .RedirectTo) "https://dny-call-qa.vercel.app") (eq (printf "%.21s" .RedirectTo) "http://localhost:3100") }}
+<div style="font-family: Arial, Helvetica, sans-serif; color: #1c1c1a; max-width: 480px">
+  <h2 style="margin: 0 0 12px">Sign in to DNY Sales Agent</h2>
+  <p style="margin: 0 0 16px">Click the button to sign in. The link works once and expires in an hour.</p>
+  <p style="margin: 0 0 24px">
+    <a
+      href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=email"
+      style="background: #c23b2f; color: #ffffff; padding: 10px 18px; border-radius: 8px; text-decoration: none; display: inline-block"
+      >Sign in</a
+    >
+  </p>
+  <p style="margin: 0; color: #6b6b65; font-size: 13px">If you didn't ask to sign in, you can ignore this email.</p>
+</div>
+{{ else }}
 <!doctype html>
 <html lang="en">
   <head>
@@ -55,3 +70,4 @@
     </table>
   </body>
 </html>
+{{ end }}
