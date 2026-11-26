@@ -90,9 +90,10 @@ export default async function SettingsPage() {
           <>
             <Card id="team" title="Team" description="Who can sign in. Adding someone creates their login at once; deactivating stops it within the hour.">
               <TeamTable people={people} selfEmail={person.email} />
-              <div className="mt-5 border-t border-hairline pt-4">
-                <h3 className="label-xs mb-3">Add a person</h3>
-                <AddPersonForm />
+              <div className="mt-5 rounded-card border border-hairline bg-raised p-4 sm:p-5">
+                <h3 className="text-[14px] font-medium text-ink">Add a person</h3>
+                <p className="mt-0.5 mb-4 text-[13px] leading-[18px] text-ink-3">They can sign in with Google or an email link as soon as you add them.</p>
+                <AddPersonForm departments={[...new Set(people.map((p) => p.dept?.trim()).filter((d): d is string => !!d))].sort()} />
               </div>
             </Card>
 
