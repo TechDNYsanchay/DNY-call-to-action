@@ -42,7 +42,7 @@ tl;dv webhook. Since 26 Nov 2026 the two apps share one Supabase project (`dny-a
   each migration added here needs a `<version>_cta_<name>.sql` placeholder in dny-call-qa.
 - Storage: this app's bucket is `call-recordings`; Sales QA's are `recordings` and `references`.
 
-Sales QA's old project `dny-call-qa` (ref `jlqppprkvlwhtbvhgiik`) was renamed `trs` for future TRS work.
+Sales QA's old project `dny-call-qa` (ref `jlqppprkvlwhtbvhgiik`) was deleted on 26 Nov 2026 after its data was copied here.
 Shared with it: the company tl;dv account (and its API key),
 and the Callyzer and Deepgram keys (copied from Sales QA, below).
 The ERP it will integrate with later is GitHub repo TechDNYsanchay/dny-erp.
